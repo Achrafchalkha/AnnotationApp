@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assign Annotators - Annotation Platform</title>
+    <link rel="stylesheet" th:href="@{/css/tailwind.css}">
+</head>
+<body>
+    <div>
+        <h1>Assign Annotators to Dataset</h1>
+        <p>Dataset Name: <span th:text="${dataset.name}">Dataset Name</span></p>
+        
+        <form th:action="@{'/admin/datasets/assign-annotators/' + ${dataset.id}}" method="post">
+            <div>
+                <h2>Select Annotators (minimum 3)</h2>
+                <div>
+                    <div th:each="annotator : ${annotators}">
+                        <input type="checkbox" name="annotatorIds" th:value="${annotator.id}">
+                        <span th:text="${annotator.firstname + ' ' + annotator.lastname}">Annotator Name</span>
+                    </div>
+                    <div th:if="${annotators.size() == 0}">
+                        No annotators available. Please add users with the USER role first.
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <label for="deadline">Task Deadline</label>
+                <input type="date" id="deadline" name="deadline" required>
+            </div>
+            
+            <div>
+                <a th:href="@{/admin/datasets}">Cancel</a>
+                <button type="submit">Assign Annotators</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html> 

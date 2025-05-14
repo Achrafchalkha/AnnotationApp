@@ -3,6 +3,7 @@ package com.annotation.controller;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,13 @@ import com.annotation.service.CoupleTextServiceImpl;
 import com.annotation.service.AsyncDatasetParserService;
 import com.annotation.model.Dataset;
 import com.annotation.model.CoupleText;
+import com.annotation.model.User;
+import com.annotation.model.Task;
+import com.annotation.model.Role;
+import com.annotation.repository.UserRepository;
+import com.annotation.repository.RoleRepository;
+import com.annotation.repository.TaskRepository;
+import com.annotation.service.AnnotatorAssignmentService;
 
 @Controller
 @RequestMapping("/admin")
@@ -30,14 +38,30 @@ public class DatasetController {
     private final CoupleTextServiceImpl coupleTextService;
     private final AsyncDatasetParserService asyncDatasetParserService;
     private final DefaultUserServiceImpl userService;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final TaskRepository taskRepository;
+    private final AnnotatorAssignmentService annotatorAssignmentService;
 
     // Constructor-based injection for both services
     @Autowired
-    public DatasetController(DatasetServiceImpl datasetService, CoupleTextServiceImpl coupleTextService, AsyncDatasetParserService asyncDatasetParserService,DefaultUserServiceImpl userService) {
+    public DatasetController(
+        DatasetServiceImpl datasetService, 
+        CoupleTextServiceImpl coupleTextService, 
+        AsyncDatasetParserService asyncDatasetParserService,
+        DefaultUserServiceImpl userService,
+        UserRepository userRepository,
+        RoleRepository roleRepository,
+        TaskRepository taskRepository,
+        AnnotatorAssignmentService annotatorAssignmentService) {
         this.datasetService = datasetService;
         this.coupleTextService = coupleTextService;
         this.asyncDatasetParserService = asyncDatasetParserService;
         this.userService = userService;
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.taskRepository = taskRepository;
+        this.annotatorAssignmentService = annotatorAssignmentService;
     }
 
     @GetMapping("/datasets")
@@ -68,13 +92,14 @@ public class DatasetController {
 
         String currentUserName = StringUtils.capitalize(userService.getCurrentUserName());
         model.addAttribute("currentUserName", currentUserName);
+        
         Dataset dataset = datasetService.findDatasetById(id);
-        Page<CoupleText> coupleTextsPage = coupleTextService.getCoupleTextsByDatasetId(id, page, size);
-
         if (dataset == null) {
             model.addAttribute("errorMessage", "Dataset not found");
             return "redirect:/admin/datasets";
         }
+        
+        Page<CoupleText> coupleTextsPage = coupleTextService.getCoupleTextsByDatasetId(id, page, size);
 
         int totalPages = coupleTextsPage.getTotalPages();
         int currentPage = page;
@@ -83,6 +108,31 @@ public class DatasetController {
         int startPage = Math.max(0, currentPage - 2);
         int endPage = Math.min(totalPages - 1, currentPage + 2);
 
+        // Get assigned annotators (users with tasks for this dataset)
+        // Use direct SQL query to ensure we get all the data we need in one go
+        List<Task> tasks = null;
+        try {
+            tasks = taskRepository.findByDatasetIdWithUserAndDataset(id);
+            System.out.println("Found " + tasks.size() + " tasks for dataset ID: " + id);
+            
+            // Add debug information for each task
+            for (Task task : tasks) {
+                User user = task.getUser();
+                if (user != null) {
+                    System.out.println("Task ID: " + task.getId() + 
+                        ", User: " + user.getFirstname() + " " + user.getLastname() + 
+                        " (ID: " + user.getId() + ")");
+                } else {
+                    System.out.println("Task ID: " + task.getId() + " has no user assigned!");
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error fetching tasks: " + e.getMessage());
+            e.printStackTrace();
+            tasks = new ArrayList<>();
+        }
+
+        model.addAttribute("tasks", tasks != null ? tasks : new ArrayList<>());
         model.addAttribute("coupleTextsPage", coupleTextsPage);
         model.addAttribute("currentPage", currentPage);
         model.addAttribute("totalPages", totalPages);
@@ -253,5 +303,148 @@ public class DatasetController {
         }
         
         return response;
+    }
+    
+    // New endpoint to show annotator assignment modal
+    @GetMapping("/datasets/assign-annotators/{id}")
+    public String showAssignAnnotatorsModal(@PathVariable Long id, Model model) {
+        String currentUserName = StringUtils.capitalize(userService.getCurrentUserName());
+        model.addAttribute("currentUserName", currentUserName);
+        
+        Dataset dataset = datasetService.findDatasetById(id);
+        if (dataset == null) {
+            model.addAttribute("errorMessage", "Dataset not found");
+            return "redirect:/admin/datasets";
+        }
+        
+        // Ensure USER role exists
+        ensureUserRoleExists();
+        
+        // Get all users with USER role
+        Optional<Role> userRoleOpt = roleRepository.findByRole("USER");
+        List<User> annotators = new ArrayList<>();
+        if (userRoleOpt.isPresent()) {
+            Role userRole = userRoleOpt.get();
+            annotators = userRepository.findAllByRolesContaining(userRole);
+            
+            // Debug information
+            System.out.println("Found " + annotators.size() + " annotators with USER role");
+            for (User annotator : annotators) {
+                System.out.println("Annotator: " + annotator.getFirstname() + " " + annotator.getLastname() + " (ID: " + annotator.getId() + ")");
+            }
+        } else {
+            System.out.println("USER role not found in the database");
+        }
+        
+        model.addAttribute("dataset", dataset);
+        model.addAttribute("annotators", annotators);
+        
+        // Use the full template now that we've fixed the issues
+        return "admin/datasets_management/assign_annotators";
+    }
+    
+    // Helper method to ensure USER role exists
+    private void ensureUserRoleExists() {
+        // Check if USER role exists
+        Optional<Role> userRoleOpt = roleRepository.findByRole("USER");
+        Role userRole;
+        
+        if (!userRoleOpt.isPresent()) {
+            // Create USER role if it doesn't exist
+            System.out.println("Creating USER role");
+            userRole = new Role();
+            userRole.setRole("USER");
+            userRole = roleRepository.save(userRole);
+        } else {
+            userRole = userRoleOpt.get();
+        }
+        
+        // Check if we have at least 3 users with USER role
+        List<User> users = userRepository.findAllByRolesContaining(userRole);
+        if (users.size() < 3) {
+            // Create test users if needed
+            for (int i = users.size() + 1; i <= 3; i++) {
+                User user = new User();
+                user.setFirstname("Test");
+                user.setLastname("User " + i);
+                user.setUsername("testuser" + i);
+                user.setPassword("password"); // In real app, would be encoded
+                user.getRoles().add(userRole);
+                userRepository.save(user);
+                System.out.println("Created test user: " + user.getFirstname() + " " + user.getLastname());
+            }
+        }
+    }
+    
+    // New endpoint to process annotator assignment
+    @PostMapping("/datasets/assign-annotators/{id}")
+    public String assignAnnotatorsToDataset(
+            @PathVariable Long id,
+            @RequestParam("annotatorIds") List<Long> annotatorIds,
+            @RequestParam("deadline") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date deadline,
+            RedirectAttributes redirectAttributes) {
+        
+        if (annotatorIds.size() < 3) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Please select at least 3 annotators");
+            return "redirect:/admin/datasets/assign-annotators/" + id;
+        }
+        
+        Dataset dataset = datasetService.findDatasetById(id);
+        if (dataset == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Dataset not found");
+            return "redirect:/admin/datasets";
+        }
+        
+        try {
+            // Get all text couples for this dataset
+            List<CoupleText> allCouples = coupleTextService.findAllCoupleTextsByDatasetId(id);
+            if (allCouples.isEmpty()) {
+                redirectAttributes.addFlashAttribute("errorMessage", "No text pairs found in this dataset");
+                return "redirect:/admin/datasets/details/" + id;
+            }
+            
+            // Get selected annotators
+            List<User> selectedAnnotators = userRepository.findAllById(annotatorIds);
+            
+            // Use the dedicated service to assign tasks to annotators
+            annotatorAssignmentService.assignTasksToAnnotators(dataset, selectedAnnotators, deadline);
+            
+            redirectAttributes.addFlashAttribute("success", 
+                "Successfully assigned " + allCouples.size() + " text pairs to " + selectedAnnotators.size() + " annotators");
+            
+        } catch (Exception e) {
+            System.out.println("Error assigning annotators: " + e.getMessage());
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("errorMessage", "Error assigning annotators: " + e.getMessage());
+        }
+        
+        return "redirect:/admin/datasets/details/" + id;
+    }
+
+    // Add an endpoint to remove an annotator from a dataset
+    @PostMapping("/datasets/{datasetId}/remove-annotator/{userId}")
+    public String removeAnnotatorFromDataset(
+            @PathVariable Long datasetId,
+            @PathVariable Long userId,
+            RedirectAttributes redirectAttributes) {
+        
+        Dataset dataset = datasetService.findDatasetById(datasetId);
+        if (dataset == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Dataset not found");
+            return "redirect:/admin/datasets";
+        }
+        
+        try {
+            // Use the service to remove the annotator from the dataset
+            annotatorAssignmentService.removeAnnotatorFromDataset(datasetId, userId);
+            
+            redirectAttributes.addFlashAttribute("success", "Annotator removed from dataset successfully");
+        } catch (Exception e) {
+            System.out.println("Error removing annotator: " + e.getMessage());
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("errorMessage", "Error removing annotator: " + e.getMessage());
+        }
+        
+        return "redirect:/admin/datasets/details/" + datasetId;
     }
 }

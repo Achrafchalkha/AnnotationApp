@@ -167,6 +167,62 @@
                 </div>
             </div>
             
+            <!-- Annotators assigned to this dataset -->
+            <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6 should-animate">
+                <div class="px-4 py-5 sm:px-6 bg-gray-50 flex justify-between items-center">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Assigned Annotators</h3>
+                    <div class="flex items-center">
+                        <span class="mr-2 text-sm text-gray-500" th:text="${'Total assigned: ' + (tasks != null ? tasks.size() : 0)}">Total: 0</span>
+                        <a th:href="@{'/admin/datasets/assign-annotators/' + ${dataset.id}}" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-green-700 bg-green-100 hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                            <i class='bx bx-user-plus mr-1'></i> Assign Annotators
+                        </a>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assigned Pairs</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deadline</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr th:each="task : ${tasks}" class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${task.user != null ? task.user.id : 'N/A'}">1</td>
+                                <td class="px-6 py-4 text-sm text-gray-900" th:text="${task.user != null ? (task.user.firstname + ' ' + task.user.lastname) : 'Unknown'}">John Doe</td>
+                                <td class="px-6 py-4 text-sm text-gray-900" th:text="${task.user != null ? task.user.username : 'Unknown'}">johndoe</td>
+                                <td class="px-6 py-4 text-sm text-gray-900" th:text="${task.couples != null ? task.couples.size() : 0}">10</td>
+                                <td class="px-6 py-4 text-sm text-gray-900" th:text="${#dates.format(task.dateLimite, 'yyyy-MM-dd')}">2023-12-31</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <form th:action="@{'/admin/datasets/' + ${dataset.id} + '/remove-annotator/' + ${task.user.id}}" method="post" onsubmit="return confirm('Are you sure you want to remove this annotator? All assigned tasks will be deleted.');">
+                                        <button type="submit" class="text-red-600 hover:text-red-900">
+                                            <i class='bx bx-trash'></i> Remove
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            
+                            <!-- Empty state -->
+                            <tr th:if="${#lists.isEmpty(tasks)}">
+                                <td colspan="6" class="px-6 py-8 text-center text-sm text-gray-500">
+                                    <div class="flex flex-col items-center">
+                                        <i class='bx bx-user text-gray-400 text-3xl mb-2'></i>
+                                        <p>No annotators assigned to this dataset</p>
+                                        <a th:href="@{'/admin/datasets/assign-annotators/' + ${dataset.id}}" class="mt-2 inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-green-700 bg-green-100 hover:bg-green-200 focus:outline-none">
+                                            <i class='bx bx-user-plus mr-1'></i> Assign Annotators
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
             <!-- Text pairs table -->
             <div class="bg-white shadow overflow-hidden sm:rounded-lg should-animate">
                 <div class="px-4 py-5 sm:px-6 bg-gray-50 flex justify-between items-center">

@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,6 +17,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
+@EnableMethodSecurity // Enable @PreAuthorize, @PostAuthorize, @Secured annotations
 public class SpringSecurityConfig {
 
     private final DefaultUserServiceImpl customUserDetailsService;
@@ -48,6 +51,9 @@ public class SpringSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(authorize -> authorize
+                .requestMatchers("/admin/**").hasAuthority("ADMIN")
+                .requestMatchers("/dashboard/**").hasAnyAuthority("ADMIN", "USER")
+                .requestMatchers("/login", "/css/**", "/js/**", "/images/**").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form

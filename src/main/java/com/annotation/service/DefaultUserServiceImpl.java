@@ -44,28 +44,51 @@ public class DefaultUserServiceImpl implements DefaultUserService{
     private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Set<Role> roles){
         return roles.stream().map(role -> new SimpleGrantedAuthority(role.getRole())).collect(Collectors.toList());
     }
+    
+    /**
+     * Get the current authenticated user's username
+     */
     public String getCurrentUserName() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        
+        if (authentication != null && authentication.isAuthenticated()) {
+            return authentication.getName();
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Check if the current user has the ADMIN role
+     */
+    public boolean isCurrentUserAdmin() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         
         if (authentication != null && authentication.isAuthenticated()) {
             String username = authentication.getName();
             
-            // Check if the user has the USER role
             Optional<User> userOptional = userRepo.findByUsername(username);
             if (userOptional.isPresent()) {
                 User user = userOptional.get();
-                boolean hasUserRole = user.getRoles().stream()
-                    .anyMatch(role -> role.getRole().equals("USER"));
-                
-                if (hasUserRole) {
-                    return username;
-                }
+                return user.getRoles().stream()
+                    .anyMatch(role -> role.getRole().equals("ADMIN"));
             }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Get the current authenticated user
+     */
+    public User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        
+        if (authentication != null && authentication.isAuthenticated()) {
+            String username = authentication.getName();
+            return userRepo.findByUsername(username).orElse(null);
         }
         
         return null;
     }
-
-        
-
 }

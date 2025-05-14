@@ -29,8 +29,8 @@ public class CoupleText {
     @Column(name = "original_id")
     private Long originalId;
 
-    // Updated to match the new name in Task entity
-    @ManyToMany(mappedBy = "couples")
+    // Updated to match the new name in Task entity and added cascades
+    @ManyToMany(mappedBy = "couples", fetch = FetchType.LAZY)
     private Set<Task> assignedTasks = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
