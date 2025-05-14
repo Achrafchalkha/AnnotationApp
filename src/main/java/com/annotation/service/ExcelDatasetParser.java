@@ -104,38 +104,94 @@ public class ExcelDatasetParser {
      * Process an Excel file
      */
     private int processExcelFile(Path filePath, Dataset dataset, int maxRows) throws IOException {
-        try (InputStream fileInputStream = new FileInputStream(filePath.toFile());
-             Workbook workbook = WorkbookFactory.create(fileInputStream)) {
+        System.out.println("Excel file path: " + filePath.toAbsolutePath());
+        File excelFile = filePath.toFile();
+        
+        if (!excelFile.exists()) {
+            System.out.println("ERROR: Excel file does not exist at path: " + filePath);
+            throw new IOException("Excel file not found: " + filePath);
+        }
+        
+        System.out.println("Excel file details: Size=" + excelFile.length() + " bytes, Readable=" + excelFile.canRead());
+        
+        try (FileInputStream fileInputStream = new FileInputStream(excelFile)) {
+            // Try to create workbook with explicit handling of HSSF and XSSF formats
+            Workbook workbook;
+            String fileName = filePath.getFileName().toString().toLowerCase();
             
-            System.out.println("Successfully opened Excel workbook");
-            
-            // Process each sheet in the workbook
-            int numberOfSheets = workbook.getNumberOfSheets();
-            System.out.println("Found " + numberOfSheets + " sheets in workbook");
-            int totalProcessedRows = 0;
-            
-            for (int sheetIndex = 0; sheetIndex < numberOfSheets; sheetIndex++) {
-                Sheet sheet = workbook.getSheetAt(sheetIndex);
-                System.out.println("Processing sheet " + sheetIndex + ": " + sheet.getSheetName());
-                
-                // Skip empty sheets
-                if (sheet.getPhysicalNumberOfRows() <= 1) {
-                    System.out.println("Sheet " + sheetIndex + " is empty or only has headers, skipping");
-                    continue;
+            try {
+                if (fileName.endsWith(".xlsx")) {
+                    System.out.println("Creating XSSF workbook for .xlsx file");
+                    workbook = new XSSFWorkbook(fileInputStream);
+                } else {
+                    System.out.println("Creating general workbook using WorkbookFactory");
+                    workbook = WorkbookFactory.create(fileInputStream);
                 }
+            } catch (Exception e) {
+                System.out.println("Error creating workbook: " + e.getMessage());
+                e.printStackTrace();
                 
-                // Process rows in this sheet
-                int sheetRows = processSheet(sheet, dataset, maxRows > 0 ? maxRows : DEFAULT_MAX_ROWS);
-                totalProcessedRows += sheetRows;
-                System.out.println("Processed " + sheetRows + " rows from sheet " + sheetIndex);
-                
-                // If we've processed enough rows, stop
-                if (maxRows > 0 && totalProcessedRows >= maxRows) {
-                    break;
+                // Try to recover by reopening the stream and using a different approach
+                try (FileInputStream retryStream = new FileInputStream(excelFile)) {
+                    System.out.println("Retrying with WorkbookFactory");
+                    workbook = WorkbookFactory.create(retryStream);
+                } catch (Exception e2) {
+                    System.out.println("Error on second attempt: " + e2.getMessage());
+                    e2.printStackTrace();
+                    throw e2;
                 }
             }
             
-            return totalProcessedRows;
+            try {
+                System.out.println("Successfully opened Excel workbook");
+                
+                // Process each sheet in the workbook
+                int numberOfSheets = workbook.getNumberOfSheets();
+                System.out.println("Found " + numberOfSheets + " sheets in workbook");
+                int totalProcessedRows = 0;
+                
+                for (int sheetIndex = 0; sheetIndex < numberOfSheets; sheetIndex++) {
+                    Sheet sheet = workbook.getSheetAt(sheetIndex);
+                    System.out.println("Processing sheet " + sheetIndex + ": " + sheet.getSheetName());
+                    
+                    // Skip empty sheets
+                    if (sheet.getPhysicalNumberOfRows() <= 1) {
+                        System.out.println("Sheet " + sheetIndex + " is empty or only has headers, skipping");
+                        continue;
+                    }
+                    
+                    // Process rows in this sheet
+                    int sheetRows = processSheet(sheet, dataset, maxRows > 0 ? maxRows : DEFAULT_MAX_ROWS);
+                    totalProcessedRows += sheetRows;
+                    System.out.println("Processed " + sheetRows + " rows from sheet " + sheetIndex);
+                    
+                    // If we've processed enough rows, stop
+                    if (maxRows > 0 && totalProcessedRows >= maxRows) {
+                        break;
+                    }
+                }
+                
+                return totalProcessedRows;
+            } finally {
+                try {
+                    // Explicitly close the workbook
+                    workbook.close();
+                } catch (Exception e) {
+                    System.out.println("Warning: Error closing workbook: " + e.getMessage());
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Failed to process Excel file: " + e.getMessage());
+            e.printStackTrace();
+            
+            // As a fallback, try to read it as a CSV
+            try {
+                System.out.println("Attempting to process as CSV instead...");
+                return processCsvFile(filePath, dataset, maxRows);
+            } catch (Exception csvEx) {
+                System.out.println("CSV fallback also failed: " + csvEx.getMessage());
+                throw e; // Throw the original exception
+            }
         }
     }
     

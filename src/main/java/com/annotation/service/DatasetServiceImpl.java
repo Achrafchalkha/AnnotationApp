@@ -78,17 +78,55 @@ public class DatasetServiceImpl implements DatasetService {
             File uploadDirFile = new File(UPLOAD_DIR);
             if (!uploadDirFile.exists()) {
                 uploadDirFile.mkdirs();
+                System.out.println("Created directory: " + uploadDirFile.getAbsolutePath());
+            } else {
+                System.out.println("Using existing directory: " + uploadDirFile.getAbsolutePath());
             }
 
             // Generate a unique filename to avoid collisions
             String originalFilename = file.getOriginalFilename();
-            String uniqueFilename = UUID.randomUUID() + "_" + originalFilename;
-
+            String extension = "";
+            
+            if (originalFilename != null && originalFilename.contains(".")) {
+                extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            }
+            
+            String uniqueFilename = UUID.randomUUID() + "_" + 
+                                  (originalFilename != null ? originalFilename : "dataset" + extension);
+            
             // Create the complete file path
             Path targetLocation = Paths.get(UPLOAD_DIR, uniqueFilename).toAbsolutePath();
+            
+            System.out.println("Saving file to: " + targetLocation);
+            System.out.println("File size: " + file.getSize() + " bytes");
+            System.out.println("Content type: " + file.getContentType());
 
-            // Actually save the file to disk
-            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+            // Actually save the file to disk with explicit byte handling for better reliability
+            try (InputStream inputStream = file.getInputStream();
+                 FileOutputStream outputStream = new FileOutputStream(targetLocation.toFile())) {
+                
+                byte[] buffer = new byte[8192];
+                int bytesRead;
+                long totalBytesWritten = 0;
+                
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                    totalBytesWritten += bytesRead;
+                }
+                
+                outputStream.flush();
+                System.out.println("File written successfully. Total bytes: " + totalBytesWritten);
+                
+                // Verify file was written correctly
+                File writtenFile = targetLocation.toFile();
+                if (writtenFile.exists() && writtenFile.length() > 0) {
+                    System.out.println("Verified file exists and has size: " + writtenFile.length() + " bytes");
+                } else {
+                    System.out.println("WARNING: File verification failed. Exists: " + 
+                                 writtenFile.exists() + ", Size: " + 
+                                 (writtenFile.exists() ? writtenFile.length() : 0));
+                }
+            }
 
             // Store the absolute path in the dataset
             dataset.setFilePath(targetLocation.toString());
@@ -115,13 +153,72 @@ public class DatasetServiceImpl implements DatasetService {
 
 
     @Override
+    @Transactional
     public void SaveDataset(Dataset dataset) {
-        datasetRepository.save(dataset);
+        try {
+            if (dataset == null) {
+                System.out.println("Cannot save null dataset");
+                return;
+            }
+            
+            System.out.println("Saving dataset: ID=" + dataset.getId() + ", Name=" + dataset.getName());
+            
+            // Check if dataset exists in database
+            boolean isNew = dataset.getId() == null;
+            Dataset saved = datasetRepository.save(dataset);
+            
+            System.out.println("Dataset " + (isNew ? "created" : "updated") + " with ID: " + saved.getId());
+            
+            // Verify dataset was saved
+            Dataset verified = datasetRepository.findById(saved.getId()).orElse(null);
+            if (verified != null) {
+                System.out.println("Verified dataset exists in database with ID: " + verified.getId());
+            } else {
+                System.out.println("WARNING: Failed to verify dataset with ID: " + saved.getId());
+            }
+        } catch (Exception e) {
+            System.out.println("Error saving dataset: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @Override
+    @Transactional
     public void deleteDataset(Long id) {
-        datasetRepository.deleteById(id);
+        try {
+            Dataset dataset = datasetRepository.findById(id).orElse(null);
+            if (dataset == null) {
+                System.out.println("Dataset not found with ID: " + id);
+                return;
+            }
+            
+            // Explicitly delete related couple texts first
+            System.out.println("Deleting related text pairs for dataset ID: " + id);
+            coupleTextRepository.deleteByDatasetId(id);
+            
+            // Now delete the dataset
+            System.out.println("Deleting dataset with ID: " + id);
+            datasetRepository.deleteById(id);
+            
+            // Delete the file if it exists
+            if (dataset.getFilePath() != null && !dataset.getFilePath().isEmpty()) {
+                try {
+                    File file = new File(dataset.getFilePath());
+                    if (file.exists()) {
+                        boolean deleted = file.delete();
+                        System.out.println("Dataset file " + (deleted ? "deleted" : "could not be deleted") + 
+                                       ": " + dataset.getFilePath());
+                    }
+                } catch (Exception e) {
+                    System.out.println("Error deleting dataset file: " + e.getMessage());
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error in deleteDataset: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @Override

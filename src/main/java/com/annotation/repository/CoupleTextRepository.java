@@ -19,4 +19,9 @@ public interface CoupleTextRepository extends JpaRepository<CoupleText, Long> {
     List<CoupleText> findByDataset(Dataset dataset);
     Page<CoupleText> findByDataset(Dataset dataset, Pageable pageable);
     long countByDatasetId(Long datasetId);
+    
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM CoupleText c WHERE c.dataset.id = :datasetId")
+    void deleteByDatasetId(@Param("datasetId") Long datasetId);
 }

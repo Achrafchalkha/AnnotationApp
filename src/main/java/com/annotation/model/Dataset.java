@@ -37,7 +37,7 @@ public class Dataset {
 
 
     //relation taches/dataset
-    @OneToMany(mappedBy="dataset")
+    @OneToMany(mappedBy="dataset", cascade = CascadeType.REMOVE)
     private List<Task> tasks = new ArrayList<>();
 
     //relation classe/dataset
@@ -45,6 +45,6 @@ public class Dataset {
     private Set<ClassPossible> classesPossibles = new HashSet<>();
 
     //relation coupleText/dataset
-    @OneToMany(mappedBy="dataset")
+    @OneToMany(mappedBy="dataset", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CoupleText> coupleTexts = new HashSet<>();
 }
