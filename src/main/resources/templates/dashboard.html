@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - Annotation Platform</title>
+    
+    <!-- Tailwind CSS -->
+    <link rel="stylesheet" th:href="@{/css/tailwind.css}">
+    
+    <!-- Boxicons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Navbar -->
+    <nav class="bg-gradient-to-r from-blue-600 to-indigo-700 shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class='bx bx-analyse text-white text-2xl mr-2'></i>
+                        <span class="text-white font-bold text-xl">Annotation Platform</span>
+                    </div>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex md:items-center md:space-x-4">
+                    <a href="#" class="text-white hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
+                        <i class='bx bxs-dashboard mr-1'></i> Dashboard
+                    </a>
+                    <a href="#" class="text-white hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
+                        <i class='bx bx-task mr-1'></i> My Tasks
+                    </a>
+                    <div class="relative ml-3">
+                        <div>
+                            <button type="button" class="flex items-center text-white hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" id="user-menu-button" aria-expanded="false" aria-haspopup="true" data-dropdown-toggle="user-dropdown">
+                                <i class='bx bx-user-circle mr-1'></i>
+                                <span th:text="${userDetails}">User</span>
+                                <i class='bx bx-chevron-down ml-1'></i>
+                            </button>
+                        </div>
+                        <div class="hidden origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5" id="user-dropdown">
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your Profile</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+                            <a th:href="@{/logout}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign out</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="flex items-center md:hidden">
+                    <button type="button" class="text-white hover:bg-blue-700 hover:text-white inline-flex items-center justify-center p-2 rounded-md" id="mobile-menu-button">
+                        <i class='bx bx-menu text-2xl'></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div class="hidden md:hidden bg-blue-800" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="#" class="text-white hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">
+                    <i class='bx bxs-dashboard mr-1'></i> Dashboard
+                </a>
+                <a href="#" class="text-white hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">
+                    <i class='bx bx-task mr-1'></i> My Tasks
+                </a>
+                <a th:href="@{/logout}" class="text-white hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">
+                    <i class='bx bx-log-out mr-1'></i> Sign out
+                </a>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main content -->
+    <main class="flex-grow py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Welcome card -->
+            <div class="bg-white overflow-hidden shadow-sm rounded-lg mb-6 should-animate">
+                <div class="px-4 py-5 sm:p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 bg-indigo-500 rounded-md p-3">
+                            <i class='bx bx-user text-white text-2xl'></i>
+                        </div>
+                        <div class="ml-5">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">
+                                Welcome, <span th:text="${userDetails}" class="font-semibold">User</span>!
+                            </h3>
+                            <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                                You are logged in as a standard user. Here's your dashboard overview.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dashboard stats -->
+            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 mb-8">
+                <!-- Tasks card -->
+                <div class="bg-white overflow-hidden shadow-sm rounded-lg should-animate">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">
+                                <i class='bx bx-task text-white text-2xl'></i>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">
+                                        Total Tasks
+                                    </dt>
+                                    <dd>
+                                        <div class="text-lg font-medium text-gray-900">
+                                            12
+                                        </div>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-4 sm:px-6">
+                        <div class="text-sm">
+                            <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">
+                                View all tasks<span class="sr-only"> Total Tasks</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Completed tasks card -->
+                <div class="bg-white overflow-hidden shadow-sm rounded-lg should-animate">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-green-500 rounded-md p-3">
+                                <i class='bx bx-check-circle text-white text-2xl'></i>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">
+                                        Completed Tasks
+                                    </dt>
+                                    <dd>
+                                        <div class="text-lg font-medium text-gray-900">
+                                            8
+                                        </div>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-4 sm:px-6">
+                        <div class="text-sm">
+                            <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">
+                                View completed<span class="sr-only"> Completed Tasks</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pending tasks card -->
+                <div class="bg-white overflow-hidden shadow-sm rounded-lg should-animate">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-yellow-500 rounded-md p-3">
+                                <i class='bx bx-time text-white text-2xl'></i>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">
+                                        Pending Tasks
+                                    </dt>
+                                    <dd>
+                                        <div class="text-lg font-medium text-gray-900">
+                                            4
+                                        </div>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-4 sm:px-6">
+                        <div class="text-sm">
+                            <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">
+                                View pending<span class="sr-only"> Pending Tasks</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent activity -->
+            <div class="bg-white shadow-sm rounded-lg should-animate">
+                <div class="px-4 py-5 sm:px-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">
+                        Recent Activity
+                    </h3>
+                    <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                        Your latest annotation activities.
+                    </p>
+                </div>
+                <div class="border-t border-gray-200">
+                    <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt class="text-sm font-medium text-gray-500">
+                            No recent activities
+                        </dt>
+                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                            Start annotating to see your activity here.
+                        </dd>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-white shadow-inner mt-auto">
+        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-sm text-gray-500">
+                &copy; 2023 Annotation Platform. All rights reserved.
+            </p>
+        </div>
+    </footer>
+    
+    <!-- Main JavaScript -->
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

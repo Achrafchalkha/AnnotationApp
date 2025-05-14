@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dataset Details - Annotation Platform</title>
+    
+    <!-- Tailwind CSS -->
+    <link rel="stylesheet" th:href="@{/css/tailwind.css}">
+    
+    <!-- Boxicons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Navbar -->
+    <nav class="bg-gradient-to-r from-blue-600 to-indigo-700 shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class='bx bx-analyse text-white text-2xl mr-2'></i>
+                        <span class="text-white font-bold text-xl">Annotation Platform</span>
+                    </div>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex md:items-center md:space-x-4">
+                    <a th:href="@{/admin}" class="text-white hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
+                        <i class='bx bxs-dashboard mr-1'></i> Dashboard
+                    </a>
+                    <a th:href="@{/admin/datasets}" class="bg-blue-700 text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
+                        <i class='bx bx-data mr-1'></i> Datasets
+                    </a>
+                    <a th:href="@{/admin/users}" class="text-white hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
+                        <i class='bx bx-user mr-1'></i> Users
+                    </a>
+                    <div class="relative ml-3">
+                        <div>
+                            <button type="button" class="flex items-center text-white hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" id="user-menu-button" aria-expanded="false" aria-haspopup="true" data-dropdown-toggle="user-dropdown">
+                                <i class='bx bx-user-circle mr-1'></i>
+                                <span th:text="${currentUserName}">User</span>
+                                <i class='bx bx-chevron-down ml-1'></i>
+                            </button>
+                        </div>
+                        <div class="hidden origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5" id="user-dropdown">
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your Profile</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+                            <a th:href="@{/logout}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign out</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="flex items-center md:hidden">
+                    <button type="button" class="text-white hover:bg-blue-700 hover:text-white inline-flex items-center justify-center p-2 rounded-md" id="mobile-menu-button">
+                        <i class='bx bx-menu text-2xl'></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div class="hidden md:hidden bg-blue-800" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a th:href="@{/admin}" class="text-white hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">
+                    <i class='bx bxs-dashboard mr-1'></i> Dashboard
+                </a>
+                <a th:href="@{/admin/datasets}" class="bg-blue-700 text-white block px-3 py-2 rounded-md text-base font-medium">
+                    <i class='bx bx-data mr-1'></i> Datasets
+                </a>
+                <a th:href="@{/admin/users}" class="text-white hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">
+                    <i class='bx bx-user mr-1'></i> Users
+                </a>
+                <a th:href="@{/logout}" class="text-white hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">
+                    <i class='bx bx-log-out mr-1'></i> Sign out
+                </a>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main content -->
+    <main class="flex-grow py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-2xl font-bold text-gray-900 flex items-center">
+                    <i class='bx bx-detail text-blue-600 mr-2 text-3xl'></i>
+                    Dataset Details
+                </h1>
+                <div class="flex space-x-2">
+                    <a th:href="@{/admin/datasets}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class='bx bx-arrow-back mr-1'></i>
+                        Back to Datasets
+                    </a>
+                    <form th:action="@{'/admin/datasets/delete/' + ${dataset.id}}" method="post" onsubmit="return confirm('Are you sure you want to delete this dataset? This action cannot be undone.');">
+                        <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                            <i class='bx bx-trash mr-1'></i>
+                            Delete Dataset
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Processing message -->
+            <div th:if="${processingMessage}" class="mb-6">
+                <div class="bg-blue-50 border-l-4 border-blue-400 p-4 flash-message transition-opacity duration-300">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class='bx bx-loader-circle text-blue-400 text-xl animate-spin'></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-blue-700" th:text="${processingMessage}">Processing message</p>
+                            <p id="status-message" class="text-xs text-blue-500 mt-1">Checking processing status...</p>
+                        </div>
+                        <div class="ml-auto pl-3 flex items-center">
+                            <a href="javascript:void(0)" onclick="checkStatus()" class="inline-flex items-center px-3 py-1 mr-2 border border-transparent text-xs font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none">
+                                <i class='bx bx-refresh mr-1'></i> Check Status
+                            </a>
+                            <a th:href="@{'/admin/datasets/process/' + ${dataset.id}}" class="inline-flex items-center px-3 py-1 mr-2 border border-transparent text-xs font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none">
+                                <i class='bx bx-play-circle mr-1'></i> Reprocess
+                            </a>
+                            <a th:href="@{'/admin/datasets/details/' + ${dataset.id}}" class="inline-flex items-center px-3 py-1 mr-2 border border-transparent text-xs font-medium rounded-md text-green-700 bg-green-100 hover:bg-green-200 focus:outline-none">
+                                <i class='bx bx-refresh mr-1'></i> Refresh Page
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dataset info -->
+            <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6 should-animate">
+                <div class="px-4 py-5 sm:px-6 bg-gray-50">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900" th:text="${dataset.name}">Dataset Name</h3>
+                    <p class="mt-1 max-w-2xl text-sm text-gray-500" th:text="${dataset.description}">Dataset description</p>
+                </div>
+                <div class="border-t border-gray-200">
+                    <dl>
+                        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                            <dt class="text-sm font-medium text-gray-500">File</dt>
+                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2" th:text="${dataset.filePath != null ? dataset.filePath : 'No file'}">filename.xlsx</dd>
+                        </div>
+                        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                            <dt class="text-sm font-medium text-gray-500">Classes</dt>
+                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                                <div class="flex flex-wrap gap-2">
+                                    <span th:each="class : ${dataset.classesPossibles}" 
+                                          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        <span th:text="${class.textClass}">Class</span>
+                                    </span>
+                                </div>
+                            </dd>
+                        </div>
+                        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                            <dt class="text-sm font-medium text-gray-500">Text Pairs</dt>
+                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2" th:text="${coupleTextsPage.totalElements}">0</dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+            
+            <!-- Text pairs table -->
+            <div class="bg-white shadow overflow-hidden sm:rounded-lg should-animate">
+                <div class="px-4 py-5 sm:px-6 bg-gray-50 flex justify-between items-center">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Text Pairs</h3>
+                    <div class="flex space-x-2">
+                        <button type="button" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <i class='bx bx-export mr-1'></i> Export
+                        </button>
+                        <button type="button" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-green-700 bg-green-100 hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                            <i class='bx bx-plus mr-1'></i> Add Pair
+                        </button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Text 1</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Text 2</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr th:each="couple : ${coupleTextsPage.content}" class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${couple.id}">1</td>
+                                <td class="px-6 py-4 text-sm text-gray-900" th:text="${couple.text1}">Text 1</td>
+                                <td class="px-6 py-4 text-sm text-gray-900" th:text="${couple.text2}">Text 2</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <div class="flex space-x-2">
+                                        <button type="button" class="text-indigo-600 hover:text-indigo-900">
+                                            <i class='bx bx-edit-alt'></i>
+                                        </button>
+                                        <button type="button" class="text-red-600 hover:text-red-900">
+                                            <i class='bx bx-trash'></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <!-- Empty state -->
+                            <tr th:if="${coupleTextsPage.empty}">
+                                <td colspan="4" class="px-6 py-8 text-center text-sm text-gray-500">
+                                    <div class="flex flex-col items-center">
+                                        <i class='bx bx-file text-gray-400 text-3xl mb-2'></i>
+                                        <p>No text pairs found in this dataset</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <div th:if="${totalPages > 0}" class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-sm text-gray-700">
+                                Showing
+                                <span class="font-medium" th:text="${coupleTextsPage.numberOfElements}">10</span>
+                                of
+                                <span class="font-medium" th:text="${coupleTextsPage.totalElements}">100</span>
+                                results
+                            </p>
+                        </div>
+                        <div>
+                            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                <!-- Previous page -->
+                                <a th:if="${currentPage > 0}" 
+                                   th:href="@{'/admin/datasets/details/' + ${dataset.id}(page=${currentPage - 1})}"
+                                   class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <i class='bx bx-chevron-left'></i>
+                                    <span class="sr-only">Previous</span>
+                                </a>
+                                <span th:unless="${currentPage > 0}" 
+                                      class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-gray-100 text-sm font-medium text-gray-400 cursor-not-allowed">
+                                    <i class='bx bx-chevron-left'></i>
+                                    <span class="sr-only">Previous</span>
+                                </span>
+                                
+                                <!-- Page numbers -->
+                                <a th:each="i : ${#numbers.sequence(startPage, endPage)}"
+                                   th:href="@{'/admin/datasets/details/' + ${dataset.id}(page=${i})}"
+                                   th:text="${i + 1}"
+                                   th:class="${i == currentPage} ? 'relative inline-flex items-center px-4 py-2 border border-gray-300 bg-blue-50 text-sm font-medium text-blue-600 hover:bg-blue-100' : 'relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50'">
+                                    1
+                                </a>
+                                
+                                <!-- Next page -->
+                                <a th:if="${currentPage < totalPages - 1}" 
+                                   th:href="@{'/admin/datasets/details/' + ${dataset.id}(page=${currentPage + 1})}"
+                                   class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <i class='bx bx-chevron-right'></i>
+                                    <span class="sr-only">Next</span>
+                                </a>
+                                <span th:unless="${currentPage < totalPages - 1}" 
+                                      class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-gray-100 text-sm font-medium text-gray-400 cursor-not-allowed">
+                                    <i class='bx bx-chevron-right'></i>
+                                    <span class="sr-only">Next</span>
+                                </span>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-white shadow-inner mt-auto">
+        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-sm text-gray-500">
+                &copy; 2023 Annotation Platform. All rights reserved.
+            </p>
+        </div>
+    </footer>
+    
+    <!-- Main JavaScript -->
+    <script th:src="@{/js/main.js}"></script>
+    
+    <!-- Update the auto-refresh script -->
+    <script th:if="${processingMessage}" th:inline="javascript">
+        // Get the dataset ID
+        const datasetId = /*[[${dataset.id}]]*/ '';
+        const statusElement = document.getElementById('status-message');
+        
+        // Function to check processing status
+        function checkStatus() {
+            statusElement.textContent = 'Checking status...';
+            fetch(`/admin/datasets/status/${datasetId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        if (data.isCompleted) {
+                            statusElement.textContent = `Processing complete! Found ${data.textPairsCount} text pairs. Refreshing...`;
+                            setTimeout(() => window.location.reload(), 1500);
+                        } else if (data.isFailed) {
+                            statusElement.textContent = 'Processing failed. Please try again or contact support.';
+                        } else if (data.isProcessing) {
+                            statusElement.textContent = 'Still processing, please wait...';
+                            setTimeout(checkStatus, 3000);
+                        } else {
+                            statusElement.textContent = `Found ${data.textPairsCount} text pairs. Status: ${data.status}`;
+                            if (data.textPairsCount === 0) {
+                                setTimeout(checkStatus, 3000);
+                            }
+                        }
+                    } else {
+                        statusElement.textContent = data.message || 'Error checking status';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking processing status:', error);
+                    statusElement.textContent = 'Error checking status. Please try again.';
+                });
+        }
+        
+        // Start checking status
+        setTimeout(checkStatus, 1000);
+    </script>
+</body>
+</html>

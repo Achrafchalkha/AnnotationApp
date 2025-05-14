@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Page</title>
+</head>
+<body>
+    <h1>Test Page</h1>
+    <p th:text="${currentUserName}">Test User</p>
+    
+    <ul>
+        <li th:each="dataset : ${datasets}" th:text="${dataset.name}">Dataset Name</li>
+    </ul>
+</body>
+</html> 
