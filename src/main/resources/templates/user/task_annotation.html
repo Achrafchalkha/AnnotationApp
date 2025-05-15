@@ -6,6 +6,18 @@
     <title>Annotate Text Pairs</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script>
+        // When page loads, replace the URL to remove the coupleId parameter
+        window.addEventListener('load', function() {
+            // Only do this if there's a coupleId parameter in the URL
+            if (window.location.href.indexOf('coupleId=') > -1) {
+                // Get the base URL without query parameters
+                var baseUrl = window.location.href.split('?')[0];
+                // Replace the current URL in the browser history without reloading
+                window.history.replaceState({}, document.title, baseUrl);
+            }
+        });
+    </script>
 </head>
 <body class="bg-gray-100">
     <div class="min-h-screen">
@@ -101,8 +113,8 @@
 
             <!-- Annotation Interface -->
             <div th:if="${not #lists.isEmpty(textPairs)}" class="bg-white shadow sm:rounded-lg overflow-hidden">
-                <!-- Get the current text pair based on the parameter, or use the first one -->
-                <div th:with="currentPairId=${param.coupleId != null ? param.coupleId[0] : (highlightCoupleId != null ? highlightCoupleId : (textPairs[0] != null ? textPairs[0].id : null))}">
+                <!-- Use the highlightCoupleId if available, otherwise use the first pair -->
+                <div th:with="currentPairId=${highlightCoupleId != null ? highlightCoupleId : (textPairs[0] != null ? textPairs[0].id : null)}">
                     <div th:each="pair : ${textPairs}" th:if="${pair.id == currentPairId}" class="px-4 py-5 sm:p-6">
                         <div class="space-y-6">
                             <div>

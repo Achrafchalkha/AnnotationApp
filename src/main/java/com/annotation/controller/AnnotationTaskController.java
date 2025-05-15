@@ -577,9 +577,11 @@ public class AnnotationTaskController {
      * Direct access to text pairs for a task
      */
     @GetMapping("/tasks/{taskId}/direct-access")
-    public String directAccessTaskPairs(@PathVariable Long taskId, Model model) {
+    public String directAccessTaskPairs(@PathVariable Long taskId, 
+                                      @RequestParam(value = "coupleId", required = false) Long requestedCoupleId,
+                                      Model model) {
         try {
-            logger.info("Direct access to text pairs for task ID: " + taskId);
+            logger.info("Direct access to text pairs for task ID: " + taskId + (requestedCoupleId != null ? ", requested couple ID: " + requestedCoupleId : ""));
             
             // Get current user
             String username = userService.getCurrentUserName();
@@ -750,11 +752,30 @@ public class AnnotationTaskController {
             model.addAttribute("annotatedPairs", annotatedPairs);
             model.addAttribute("progressPercentage", progressPercentage);
             
-            // If there are no text pairs, show an appropriate message
-            if (textPairs.isEmpty()) {
-                logger.warning("No text pairs found for task " + taskId);
-                model.addAttribute("infoMessage", "No text pairs assigned to this task");
-            } else {
+            // Handle the requested couple ID
+            if (requestedCoupleId != null) {
+                // Verify the requested couple ID belongs to this task
+                boolean coupleFound = false;
+                for (CoupleText pair : textPairs) {
+                    if (pair.getId().equals(requestedCoupleId)) {
+                        coupleFound = true;
+                        break;
+                    }
+                }
+                
+                if (coupleFound) {
+                    // Set the requested couple ID as the current one to display
+                    model.addAttribute("highlightCoupleId", requestedCoupleId);
+                    logger.info("Using requested couple ID: " + requestedCoupleId);
+                } else {
+                    logger.warning("Requested couple ID " + requestedCoupleId + " not found in task " + taskId);
+                    // Fall back to the first unannotated pair
+                }
+            }
+            
+            // If no specific couple was requested or the requested one wasn't found,
+            // try to find the first unannotated one
+            if (!model.containsAttribute("highlightCoupleId") && !textPairs.isEmpty()) {
                 // Find the first unannotated text pair to focus on initially
                 CoupleText firstUnannotatedPair = null;
                 for (CoupleText pair : textPairs) {
@@ -767,6 +788,11 @@ public class AnnotationTaskController {
                 // If we found an unannotated pair, highlight it in the model
                 if (firstUnannotatedPair != null) {
                     model.addAttribute("highlightCoupleId", firstUnannotatedPair.getId());
+                    logger.info("Using first unannotated couple ID: " + firstUnannotatedPair.getId());
+                } else {
+                    // If all pairs are annotated, just use the first one
+                    model.addAttribute("highlightCoupleId", textPairs.get(0).getId());
+                    logger.info("All pairs annotated, using first pair ID: " + textPairs.get(0).getId());
                 }
             }
             
@@ -846,38 +872,7 @@ public class AnnotationTaskController {
                 stmt.setLong(2, coupleId);
                 int updated = stmt.executeUpdate();
                 
-                if (updated > 0) {
-                    logger.info("Successfully saved annotation for text pair " + coupleId);
-                    
-                    // Calculate the new progress after saving this annotation
-                    int totalPairs = 0;
-                    int annotatedPairs = 0;
-                    
-                    try (PreparedStatement countStmt = conn.prepareStatement(
-                            "SELECT COUNT(*) AS total FROM task_couple WHERE task_id = ?")) {
-                        countStmt.setLong(1, taskId);
-                        try (ResultSet rs = countStmt.executeQuery()) {
-                            if (rs.next()) {
-                                totalPairs = rs.getInt("total");
-                            }
-                        }
-                    }
-                    
-                    try (PreparedStatement annotatedStmt = conn.prepareStatement(
-                            "SELECT COUNT(*) AS annotated FROM couple_text c " +
-                            "JOIN task_couple tc ON c.id = tc.couple_id " +
-                            "WHERE tc.task_id = ? AND c.class_annotation IS NOT NULL AND c.class_annotation != ''")) {
-                        annotatedStmt.setLong(1, taskId);
-                        try (ResultSet rs = annotatedStmt.executeQuery()) {
-                            if (rs.next()) {
-                                annotatedPairs = rs.getInt("annotated");
-                            }
-                        }
-                    }
-                    
-                    int progressPercentage = totalPairs > 0 ? (annotatedPairs * 100) / totalPairs : 0;
-                    redirectAttributes.addFlashAttribute("success", "Annotation saved successfully. Progress: " + progressPercentage + "%");
-                } else {
+                if (updated <= 0) {
                     logger.warning("Failed to update annotation for text pair " + coupleId);
                     redirectAttributes.addFlashAttribute("errorMessage", "Failed to save annotation");
                     return "redirect:/user/tasks/" + taskId + "/direct-access?coupleId=" + coupleId;
@@ -935,7 +930,8 @@ public class AnnotationTaskController {
             
             if (nextCoupleId != null) {
                 logger.info("Moving to next text pair " + nextCoupleId);
-                // Redirect to the next pair
+                // Redirect to the direct-access endpoint with the next couple ID
+                // But don't include any success message
                 return "redirect:/user/tasks/" + taskId + "/direct-access?coupleId=" + nextCoupleId;
             } else {
                 logger.info("All text pairs in task " + taskId + " have been annotated");
@@ -1031,230 +1027,5 @@ public class AnnotationTaskController {
             redirectAttributes.addFlashAttribute("errorMessage", "An error occurred: " + e.getMessage());
             return "redirect:/user/tasks";
         }
-    }
-    
-    /**
-     * REST endpoint for AJAX annotation
-     */
-    @PostMapping("/tasks/{taskId}/ajax-annotate")
-    @ResponseBody
-    public Map<String, Object> ajaxAnnotate(
-            @PathVariable Long taskId,
-            @RequestParam("coupleId") Long coupleId,
-            @RequestParam("annotation") String annotation) {
-        
-        Map<String, Object> response = new HashMap<>();
-        
-        try {
-            logger.info("AJAX annotation save for task " + taskId + ", couple " + coupleId);
-            
-            // Get current user
-            String username = userService.getCurrentUserName();
-            User currentUser = userService.findUserByUsername(username);
-            
-            if (currentUser == null) {
-                response.put("success", false);
-                response.put("error", "User not found. Please log in again.");
-                return response;
-            }
-            
-            // Verify task belongs to user
-            boolean authorized = false;
-            try (Connection conn = dataSource.getConnection();
-                 PreparedStatement stmt = conn.prepareStatement("SELECT user_id FROM tasks WHERE id = ?")) {
-                stmt.setLong(1, taskId);
-                try (ResultSet rs = stmt.executeQuery()) {
-                    if (rs.next()) {
-                        Long userId = rs.getLong("user_id");
-                        authorized = userId.equals(currentUser.getId());
-                    }
-                }
-            }
-            
-            if (!authorized) {
-                response.put("success", false);
-                response.put("error", "You don't have permission to access this task");
-                return response;
-            }
-            
-            // Verify couple belongs to task
-            boolean coupleInTask = false;
-            try (Connection conn = dataSource.getConnection();
-                 PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT 1 FROM task_couple WHERE task_id = ? AND couple_id = ?")) {
-                stmt.setLong(1, taskId);
-                stmt.setLong(2, coupleId);
-                try (ResultSet rs = stmt.executeQuery()) {
-                    coupleInTask = rs.next();
-                }
-            }
-            
-            if (!coupleInTask) {
-                response.put("success", false);
-                response.put("error", "Text pair not found in this task");
-                return response;
-            }
-            
-            // Save the annotation directly to the database
-            try (Connection conn = dataSource.getConnection();
-                 PreparedStatement stmt = conn.prepareStatement(
-                     "UPDATE couple_text SET class_annotation = ? WHERE id = ?")) {
-                stmt.setString(1, annotation);
-                stmt.setLong(2, coupleId);
-                int updated = stmt.executeUpdate();
-                
-                if (updated > 0) {
-                    logger.info("Successfully saved annotation for text pair " + coupleId);
-                    
-                    // Calculate the new progress after saving this annotation
-                    int totalPairs = 0;
-                    int annotatedPairs = 0;
-                    
-                    try (PreparedStatement countStmt = conn.prepareStatement(
-                            "SELECT COUNT(*) AS total FROM task_couple WHERE task_id = ?")) {
-                        countStmt.setLong(1, taskId);
-                        try (ResultSet rs = countStmt.executeQuery()) {
-                            if (rs.next()) {
-                                totalPairs = rs.getInt("total");
-                            }
-                        }
-                    }
-                    
-                    try (PreparedStatement annotatedStmt = conn.prepareStatement(
-                            "SELECT COUNT(*) AS annotated FROM couple_text c " +
-                            "JOIN task_couple tc ON c.id = tc.couple_id " +
-                            "WHERE tc.task_id = ? AND c.class_annotation IS NOT NULL AND c.class_annotation != ''")) {
-                        annotatedStmt.setLong(1, taskId);
-                        try (ResultSet rs = annotatedStmt.executeQuery()) {
-                            if (rs.next()) {
-                                annotatedPairs = rs.getInt("annotated");
-                            }
-                        }
-                    }
-                    
-                    int progressPercentage = totalPairs > 0 ? (annotatedPairs * 100) / totalPairs : 0;
-                    
-                    // Add progress data to response
-                    response.put("progressPercentage", progressPercentage);
-                    response.put("annotatedPairs", annotatedPairs);
-                    response.put("totalPairs", totalPairs);
-                    
-                } else {
-                    logger.warning("Failed to update annotation for text pair " + coupleId);
-                    response.put("success", false);
-                    response.put("error", "Failed to save annotation");
-                    return response;
-                }
-            }
-            
-            // Find the next unannotated text pair
-            Long nextCoupleId = null;
-            Map<String, Object> nextPair = new HashMap<>();
-            boolean foundCurrent = false;
-            
-            try (Connection conn = dataSource.getConnection();
-                 PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT c.id, c.class_annotation FROM couple_text c " +
-                     "JOIN task_couple tc ON c.id = tc.couple_id " +
-                     "WHERE tc.task_id = ? " +
-                     "ORDER BY c.id")) {
-                stmt.setLong(1, taskId);
-                
-                try (ResultSet rs = stmt.executeQuery()) {
-                    // First pass: look for the next unannotated pair after the current one
-                    while (rs.next()) {
-                        Long id = rs.getLong("id");
-                        String classAnnotation = rs.getString("class_annotation");
-                        
-                        if (foundCurrent && (classAnnotation == null || classAnnotation.isEmpty())) {
-                            nextCoupleId = id;
-                            break;
-                        }
-                        
-                        if (id.equals(coupleId)) {
-                            foundCurrent = true;
-                        }
-                    }
-                }
-                
-                // If we didn't find a next unannotated pair, look for any unannotated pair
-                if (nextCoupleId == null) {
-                    try (PreparedStatement stmt2 = conn.prepareStatement(
-                         "SELECT c.id FROM couple_text c " +
-                         "JOIN task_couple tc ON c.id = tc.couple_id " +
-                         "WHERE tc.task_id = ? AND (c.class_annotation IS NULL OR c.class_annotation = '') " +
-                         "AND c.id != ? " +
-                         "ORDER BY c.id LIMIT 1")) {
-                        stmt2.setLong(1, taskId);
-                        stmt2.setLong(2, coupleId);
-                        
-                        try (ResultSet rs = stmt2.executeQuery()) {
-                            if (rs.next()) {
-                                nextCoupleId = rs.getLong("id");
-                            }
-                        }
-                    }
-                }
-            }
-            
-            if (nextCoupleId != null) {
-                logger.info("Found next text pair " + nextCoupleId);
-                
-                // Get the next pair details
-                try (Connection conn = dataSource.getConnection();
-                     PreparedStatement stmt = conn.prepareStatement(
-                         "SELECT c.id, c.text1, c.text2, c.class_annotation FROM couple_text c WHERE c.id = ?")) {
-                    stmt.setLong(1, nextCoupleId);
-                    
-                    try (ResultSet rs = stmt.executeQuery()) {
-                        if (rs.next()) {
-                            nextPair.put("id", rs.getLong("id"));
-                            nextPair.put("text1", rs.getString("text1"));
-                            nextPair.put("text2", rs.getString("text2"));
-                            nextPair.put("classAnnotation", rs.getString("class_annotation"));
-                        }
-                    }
-                }
-                
-                // Get possible classes for this task
-                List<Map<String, Object>> classes = new ArrayList<>();
-                try (Connection conn = dataSource.getConnection();
-                     PreparedStatement stmt = conn.prepareStatement(
-                         "SELECT c.id, c.text_class FROM possible_class c " +
-                         "JOIN dataset d ON c.dataset_id = d.id " +
-                         "JOIN tasks t ON d.id = t.dataset_id " +
-                         "WHERE t.id = ?")) {
-                    stmt.setLong(1, taskId);
-                    
-                    try (ResultSet rs = stmt.executeQuery()) {
-                        while (rs.next()) {
-                            Map<String, Object> classInfo = new HashMap<>();
-                            classInfo.put("id", rs.getLong("id"));
-                            classInfo.put("textClass", rs.getString("text_class"));
-                            classes.add(classInfo);
-                        }
-                    }
-                }
-                
-                response.put("nextPair", nextPair);
-                response.put("classes", classes);
-                response.put("success", true);
-                response.put("allComplete", false);
-                
-            } else {
-                logger.info("All text pairs in task " + taskId + " have been annotated");
-                response.put("success", true);
-                response.put("allComplete", true);
-                response.put("message", "Task completed! All text pairs have been annotated.");
-            }
-            
-        } catch (Exception e) {
-            logger.severe("Error in AJAX annotation: " + e.getMessage());
-            e.printStackTrace();
-            response.put("success", false);
-            response.put("error", "An error occurred: " + e.getMessage());
-        }
-        
-        return response;
     }
 } 
