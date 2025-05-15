@@ -11,352 +11,349 @@
     <!-- Boxicons -->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     
-    <!-- Google Fonts - Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts - Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f9fafb;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fe;
+        }
+        
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #7048e8 0%, #9d50bb 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .menu-item {
+            transition: all 0.3s ease;
+        }
+        
+        .menu-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .menu-item.active {
+            border-left: 4px solid white;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .menu-item.active .menu-icon {
+            color: white;
+        }
+        
+        .stats-card {
+            transition: all 0.3s ease;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .main-card {
+            transition: all 0.3s ease;
+        }
+        
+        .main-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .main-card:hover .card-arrow {
+            transform: translateX(5px);
+        }
+        
+        .card-arrow {
+            transition: transform 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        .fade-in-delay-1 {
+            animation: fadeIn 0.5s ease 0.1s forwards;
+            opacity: 0;
+        }
+        
+        .fade-in-delay-2 {
+            animation: fadeIn 0.5s ease 0.2s forwards;
+            opacity: 0;
+        }
+        
+        .fade-in-delay-3 {
+            animation: fadeIn 0.5s ease 0.3s forwards;
+            opacity: 0;
+        }
+        
+        /* Fix for navbar overlap */
+        .main-content {
+            padding-top: 70px; /* Match header height */
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col">
-    <!-- Navbar -->
-    <nav class="bg-gradient-to-r from-blue-600 to-indigo-700 shadow-md sticky top-0 z-50">
+<body class="min-h-screen bg-gray-50 text-gray-800 flex flex-col">
+    <!-- Top Navigation Bar (Horizontal Navbar) -->
+    <nav class="bg-gradient-to-r from-purple-600 to-indigo-600 shadow-sm w-full z-20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 flex items-center">
-                        <i class='bx bx-analyse text-white text-2xl mr-2'></i>
-                        <span class="text-white font-bold text-xl">Annotation Platform</span>
+            <div class="flex items-center justify-between h-[70px]">
+                <!-- Logo and Navigation Links -->
+                <div class="flex items-center space-x-8">
+                    <div class="flex items-center">
+                        <div class="h-10 w-10 rounded-full bg-white bg-opacity-20 flex items-center justify-center">
+                            <i class='bx bx-analyse text-white text-xl'></i>
+                        </div>
+                        <span class="ml-3 text-white font-semibold text-lg">Annotations</span>
+                    </div>
+                    <div class="hidden md:flex space-x-2 ml-8">
+                        <a th:href="@{/admin}" class="flex items-center px-4 py-2 rounded-md text-white font-medium hover:bg-white hover:bg-opacity-10 transition menu-item">
+                            <i class='bx bxs-dashboard text-xl mr-2'></i> Dashboard
+                        </a>
+                        <a th:href="@{/admin/users}" class="flex items-center px-4 py-2 rounded-md text-white font-medium hover:bg-white hover:bg-opacity-10 transition menu-item">
+                            <i class='bx bx-user text-xl mr-2'></i> Users
+                        </a>
+                        <a th:href="@{/admin/datasets}" class="flex items-center px-4 py-2 rounded-md text-white font-medium hover:bg-white hover:bg-opacity-10 transition menu-item">
+                            <i class='bx bx-data text-xl mr-2'></i> Datasets
+                        </a>
+                        <a th:href="@{/admin/datasets/statistics}" class="flex items-center px-4 py-2 rounded-md text-white font-medium hover:bg-white hover:bg-opacity-10 transition menu-item">
+                            <i class='bx bx-line-chart text-xl mr-2'></i> Statistics
+                        </a>
                     </div>
                 </div>
-                
-                <!-- Desktop Navigation -->
-                <div class="hidden md:flex md:items-center md:space-x-4">
-                    <a th:href="@{/admin}" class="bg-blue-700 text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
-                        <i class='bx bxs-dashboard mr-1'></i> Dashboard
-                    </a>
-                    <a th:href="@{/admin/datasets}" class="text-white hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
-                        <i class='bx bx-data mr-1'></i> Datasets
-                    </a>
-                    <a th:href="@{/admin/users}" class="text-white hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
-                        <i class='bx bx-user mr-1'></i> Users
-                    </a>
-                    <div class="relative ml-3">
-                        <div>
-                            <button type="button" class="flex items-center text-white hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" id="user-menu-button" aria-expanded="false" aria-haspopup="true" data-dropdown-toggle="user-dropdown">
-                                <i class='bx bx-user-circle mr-1'></i>
-                                <span th:text="${currentUserName}">Admin</span>
-                                <i class='bx bx-chevron-down ml-1'></i>
-                            </button>
-                        </div>
-                        <div class="hidden origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5" id="user-dropdown">
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your Profile</a>
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
-                            <a th:href="@{/logout}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign out</a>
-                        </div>
+                <!-- Search, User Info, Logout -->
+                <div class="flex items-center space-x-4">
+                    <div class="relative hidden md:block">
+                        <input type="text" placeholder="Search..." class="w-64 pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        <i class='bx bx-search absolute left-3 top-2.5 text-gray-400'></i>
                     </div>
+                    <span class="text-sm font-medium text-white">Welcome, <span th:text="${currentUserName}">Admin</span></span>
+                    <a th:href="@{/logout}" class="px-3 py-1 rounded-lg bg-white bg-opacity-20 text-white flex items-center text-sm font-medium hover:bg-opacity-40 transition">
+                        <i class='bx bx-log-out mr-1'></i> Logout
+                    </a>
                 </div>
-                
-                <!-- Mobile menu button -->
-                <div class="flex items-center md:hidden">
-                    <button type="button" class="text-white hover:bg-blue-700 hover:text-white inline-flex items-center justify-center p-2 rounded-md" id="mobile-menu-button">
-                        <i class='bx bx-menu text-2xl'></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Mobile menu -->
-        <div class="hidden md:hidden bg-blue-800" id="mobile-menu">
-            <div class="px-2 pt-2 pb-3 space-y-1">
-                <a th:href="@{/admin}" class="bg-blue-700 text-white block px-3 py-2 rounded-md text-base font-medium">
-                    <i class='bx bxs-dashboard mr-1'></i> Dashboard
-                </a>
-                <a th:href="@{/admin/datasets}" class="text-white hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">
-                    <i class='bx bx-data mr-1'></i> Datasets
-                </a>
-                <a th:href="@{/admin/users}" class="text-white hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">
-                    <i class='bx bx-user mr-1'></i> Users
-                </a>
-                <a th:href="@{/logout}" class="text-white hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">
-                    <i class='bx bx-log-out mr-1'></i> Sign out
-                </a>
             </div>
         </div>
     </nav>
     
-    <!-- Main content -->
-    <main class="flex-grow py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Welcome card -->
-            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 overflow-hidden shadow-sm rounded-lg mb-8 should-animate">
-                <div class="px-4 py-5 sm:p-6">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 bg-indigo-500 rounded-md p-3">
-                            <i class='bx bx-user-circle text-white text-2xl'></i>
-                        </div>
-                        <div class="ml-5">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900">
-                                Welcome to Admin Dashboard
-                            </h3>
-                            <p class="mt-1 max-w-2xl text-sm text-gray-500">
-                                Manage your annotation platform from this central dashboard.
-                            </p>
-                        </div>
+    <!-- Main Content Area -->
+    <main class="flex-1 w-full p-6 md:p-8 pt-[40px] max-w-7xl mx-auto">
+        <!-- Header Section -->
+        <div class="mb-8 fade-in">
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
+            <p class="text-gray-600">Oversee users, assign annotation tasks, and track dataset progress across the platform.</p>
+        </div>
+        
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Users Stat -->
+            <div class="bg-white rounded-2xl shadow-sm p-6 stats-card fade-in-delay-1 border-t-4 border-purple-500">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center">
+                        <i class='bx bx-user text-purple-600 text-2xl'></i>
+                    </div>
+                    <div class="ml-4">
+                        <h2 class="text-2xl font-bold text-gray-900">24</h2>
+                        <p class="text-sm text-gray-600">Active Users</p>
                     </div>
                 </div>
             </div>
             
-            <!-- Dashboard cards -->
-            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-8">
-                <!-- Datasets card -->
-                <div class="bg-white overflow-hidden shadow-sm rounded-lg transition-all duration-300 hover:shadow-md hover:-translate-y-1 should-animate">
-                    <div class="p-6">
-                        <div class="flex flex-col items-center">
-                            <div class="flex-shrink-0 flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mb-4">
-                                <i class='bx bx-data text-blue-600 text-3xl'></i>
-                            </div>
-                            <h3 class="text-lg font-medium text-gray-900 mb-1">Datasets</h3>
-                            <p class="text-sm text-gray-500 text-center mb-4">
-                                Manage your annotation datasets
-                            </p>
-                            <a th:href="@{/admin/datasets}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                <i class='bx bx-right-arrow-alt mr-1'></i>
-                                Go to Datasets
-                            </a>
-                        </div>
+            <!-- Datasets Stat (teal) -->
+            <div class="bg-white rounded-2xl shadow-sm p-6 stats-card fade-in-delay-1 border-t-4 border-teal-500">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 h-12 w-12 rounded-full bg-teal-100 flex items-center justify-center">
+                        <i class='bx bx-data text-teal-600 text-2xl'></i>
                     </div>
-                </div>
-                
-                <!-- Users card -->
-                <div class="bg-white overflow-hidden shadow-sm rounded-lg transition-all duration-300 hover:shadow-md hover:-translate-y-1 should-animate">
-                    <div class="p-6">
-                        <div class="flex flex-col items-center">
-                            <div class="flex-shrink-0 flex items-center justify-center h-16 w-16 rounded-full bg-purple-100 mb-4">
-                                <i class='bx bx-user text-purple-600 text-3xl'></i>
-                            </div>
-                            <h3 class="text-lg font-medium text-gray-900 mb-1">Users</h3>
-                            <p class="text-sm text-gray-500 text-center mb-4">
-                                Manage annotators and administrators
-                            </p>
-                            <a th:href="@{/admin/users}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
-                                <i class='bx bx-right-arrow-alt mr-1'></i>
-                                Go to Users
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Statistics card -->
-                <div class="bg-white overflow-hidden shadow-sm rounded-lg transition-all duration-300 hover:shadow-md hover:-translate-y-1 should-animate">
-                    <div class="p-6">
-                        <div class="flex flex-col items-center">
-                            <div class="flex-shrink-0 flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
-                                <i class='bx bx-bar-chart-alt-2 text-green-600 text-3xl'></i>
-                            </div>
-                            <h3 class="text-lg font-medium text-gray-900 mb-1">Statistics</h3>
-                            <p class="text-sm text-gray-500 text-center mb-4">
-                                View platform analytics and reports
-                            </p>
-                            <a th:href="@{/admin/datasets/statistics}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                                <i class='bx bx-right-arrow-alt mr-1'></i>
-                                View Statistics
-                            </a>
-                        </div>
+                    <div class="ml-4">
+                        <h2 class="text-2xl font-bold text-gray-900">13</h2>
+                        <p class="text-sm text-gray-600">Datasets</p>
                     </div>
                 </div>
             </div>
             
-            <!-- Platform status section -->
-            <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 mb-8">
-                <!-- Progress card -->
-                <div class="bg-white overflow-hidden shadow-sm rounded-lg should-animate">
-                    <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
-                        <h3 class="text-lg font-medium text-gray-900 flex items-center">
-                            <i class='bx bx-line-chart text-blue-500 mr-2'></i>
-                            Platform Status
-                        </h3>
+            <!-- Text Pairs Stat (amber) -->
+            <div class="bg-white rounded-2xl shadow-sm p-6 stats-card fade-in-delay-1 border-t-4 border-amber-500">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 h-12 w-12 rounded-full bg-amber-100 flex items-center justify-center">
+                        <i class='bx bx-spreadsheet text-amber-600 text-2xl'></i>
                     </div>
-                    <div class="px-4 py-5 sm:p-6">
-                        <div class="space-y-6">
-                            <div>
-                                <div class="flex items-center justify-between mb-1">
-                                    <span class="text-sm font-medium text-gray-700">Dataset Usage</span>
-                                    <span class="text-sm font-medium text-gray-700">65%</span>
-                                </div>
-                                <div class="w-full bg-gray-200 rounded-full h-2.5">
-                                    <div class="bg-blue-600 h-2.5 rounded-full" style="width: 65%"></div>
-                                </div>
-                                <p class="mt-2 text-xs text-gray-500">13 active datasets out of 20 capacity</p>
-                            </div>
-                            
-                            <div>
-                                <div class="flex items-center justify-between mb-1">
-                                    <span class="text-sm font-medium text-gray-700">Annotation Progress</span>
-                                    <span class="text-sm font-medium text-gray-700">42%</span>
-                                </div>
-                                <div class="w-full bg-gray-200 rounded-full h-2.5">
-                                    <div class="bg-green-500 h-2.5 rounded-full" style="width: 42%"></div>
-                                </div>
-                                <p class="mt-2 text-xs text-gray-500">1,240 completed annotations out of 2,950</p>
-                            </div>
-                            
-                            <div>
-                                <div class="flex items-center justify-between mb-1">
-                                    <span class="text-sm font-medium text-gray-700">System Load</span>
-                                    <span class="text-sm font-medium text-gray-700">28%</span>
-                                </div>
-                                <div class="w-full bg-gray-200 rounded-full h-2.5">
-                                    <div class="bg-yellow-500 h-2.5 rounded-full" style="width: 28%"></div>
-                                </div>
-                                <p class="mt-2 text-xs text-gray-500">System resources are operating normally</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Quick actions card -->
-                <div class="bg-white overflow-hidden shadow-sm rounded-lg should-animate">
-                    <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
-                        <h3 class="text-lg font-medium text-gray-900 flex items-center">
-                            <i class='bx bx-bolt-circle text-amber-500 mr-2'></i>
-                            Quick Actions
-                        </h3>
-                    </div>
-                    <div class="px-4 py-5 sm:p-6">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <a th:href="@{/admin/datasets/add}" class="flex items-center p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
-                                <div class="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-md bg-blue-100 text-blue-600">
-                                    <i class='bx bx-plus'></i>
-                                </div>
-                                <div class="ml-4">
-                                    <p class="text-sm font-medium text-gray-900">Add Dataset</p>
-                                    <p class="text-xs text-gray-500">Upload new annotation dataset</p>
-                                </div>
-                            </a>
-                            
-                            <a href="#" class="flex items-center p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
-                                <div class="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-md bg-purple-100 text-purple-600">
-                                    <i class='bx bx-user-plus'></i>
-                                </div>
-                                <div class="ml-4">
-                                    <p class="text-sm font-medium text-gray-900">Add User</p>
-                                    <p class="text-xs text-gray-500">Create new user account</p>
-                                </div>
-                            </a>
-                            
-                            <a href="#" class="flex items-center p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
-                                <div class="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-md bg-green-100 text-green-600">
-                                    <i class='bx bx-task'></i>
-                                </div>
-                                <div class="ml-4">
-                                    <p class="text-sm font-medium text-gray-900">Assign Tasks</p>
-                                    <p class="text-xs text-gray-500">Distribute annotation tasks</p>
-                                </div>
-                            </a>
-                            
-                            <a href="#" class="flex items-center p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
-                                <div class="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-md bg-red-100 text-red-600">
-                                    <i class='bx bx-export'></i>
-                                </div>
-                                <div class="ml-4">
-                                    <p class="text-sm font-medium text-gray-900">Export Data</p>
-                                    <p class="text-xs text-gray-500">Download annotation results</p>
-                                </div>
-                            </a>
-                        </div>
+                    <div class="ml-4">
+                        <h2 class="text-2xl font-bold text-gray-900">2,950</h2>
+                        <p class="text-sm text-gray-600">Text Pairs</p>
                     </div>
                 </div>
             </div>
             
-            <!-- Recent activity -->
-            <div class="bg-white shadow-sm rounded-lg should-animate">
-                <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
-                    <h3 class="text-lg font-medium text-gray-900 flex items-center">
-                        <i class='bx bx-history text-gray-500 mr-2'></i>
-                        Recent Activity
+            <!-- Tasks Stat (green) -->
+            <div class="bg-white rounded-2xl shadow-sm p-6 stats-card fade-in-delay-1 border-t-4 border-green-500">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
+                        <i class='bx bx-task text-green-600 text-2xl'></i>
+                    </div>
+                    <div class="ml-4">
+                        <h2 class="text-2xl font-bold text-gray-900">42%</h2>
+                        <p class="text-sm text-gray-600">Tasks Completed</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Cards Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <!-- User Management Card -->
+            <div class="bg-white rounded-2xl shadow-sm overflow-hidden main-card fade-in-delay-2 border-t-4 border-purple-500">
+                <div class="p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center">
+                            <i class='bx bx-user text-purple-600 text-2xl'></i>
+                        </div>
+                        <h3 class="ml-4 text-lg font-bold text-gray-900">User Management</h3>
+                    </div>
+                    <p class="text-gray-600 mb-6">
+                        Add, edit and manage annotators in the system. Generate passwords and assign tasks.
+                    </p>
+                    <a th:href="@{/admin/users}" class="flex items-center text-purple-600 font-medium">
+                        Manage Users
+                        <i class='bx bx-right-arrow-alt ml-2 card-arrow'></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Dataset Management Card (make purple like User Management) -->
+            <div class="bg-white rounded-2xl shadow-sm overflow-hidden main-card fade-in-delay-2 border-t-4 border-purple-500">
+                <div class="p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center">
+                            <i class='bx bx-data text-purple-600 text-2xl'></i>
+                        </div>
+                        <h3 class="ml-4 text-lg font-bold text-gray-900">Dataset Management</h3>
+                    </div>
+                    <p class="text-gray-600 mb-6">
+                        Upload, organize and assign annotators to datasets. Monitor annotation progress.
+                    </p>
+                    <a th:href="@{/admin/datasets}" class="flex items-center text-purple-600 font-medium">
+                        Manage Datasets
+                        <i class='bx bx-right-arrow-alt ml-2 card-arrow'></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Statistics Card (make purple like User Management) -->
+            <div class="bg-white rounded-2xl shadow-sm overflow-hidden main-card fade-in-delay-2 border-t-4 border-purple-500">
+                <div class="p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center">
+                            <i class='bx bx-bar-chart-alt-2 text-purple-600 text-2xl'></i>
+                        </div>
+                        <h3 class="ml-4 text-lg font-bold text-gray-900">System Statistics</h3>
+                    </div>
+                    <p class="text-gray-600 mb-6">
+                        View detailed analytics about annotation progress, user performance and dataset metrics.
+                    </p>
+                    <a th:href="@{/admin/datasets/statistics}" class="flex items-center text-purple-600 font-medium">
+                        View Statistics
+                        <i class='bx bx-right-arrow-alt ml-2 card-arrow'></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Platform Status Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Progress Card -->
+            <div class="bg-white rounded-2xl shadow-sm fade-in-delay-3">
+                <div class="px-6 py-4 border-b border-gray-100">
+                    <h3 class="text-lg font-bold text-gray-900 flex items-center">
+                        <i class='bx bx-line-chart text-purple-500 mr-2'></i>
+                        Platform Status
                     </h3>
                 </div>
-                <div class="px-4 py-5 sm:p-6">
-                    <ul class="space-y-4">
-                        <li class="flex space-x-3">
-                            <div class="flex-shrink-0">
-                                <span class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-                                    <i class='bx bx-data text-blue-600'></i>
-                                </span>
+                <div class="p-6">
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-sm font-medium text-gray-700">Dataset Usage</span>
+                                <span class="text-sm font-medium text-gray-700">65%</span>
                             </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-sm font-medium text-gray-900">
-                                    New dataset uploaded
-                                </p>
-                                <p class="text-sm text-gray-500">
-                                    Customer Feedback Dataset was added by Admin
-                                </p>
-                                <p class="text-xs text-gray-400 mt-1">
-                                    2 hours ago
-                                </p>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-purple-600 h-2.5 rounded-full" style="width: 65%"></div>
                             </div>
-                        </li>
+                            <p class="mt-2 text-xs text-gray-500">13 active datasets out of 20 capacity</p>
+                        </div>
                         
-                        <li class="flex space-x-3">
-                            <div class="flex-shrink-0">
-                                <span class="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
-                                    <i class='bx bx-check-circle text-green-600'></i>
-                                </span>
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-sm font-medium text-gray-700">Annotation Progress</span>
+                                <span class="text-sm font-medium text-gray-700">42%</span>
                             </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-sm font-medium text-gray-900">
-                                    Task completed
-                                </p>
-                                <p class="text-sm text-gray-500">
-                                    John Doe completed Product Review annotation task
-                                </p>
-                                <p class="text-xs text-gray-400 mt-1">
-                                    5 hours ago
-                                </p>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-green-500 h-2.5 rounded-full" style="width: 42%"></div>
                             </div>
-                        </li>
+                            <p class="mt-2 text-xs text-gray-500">1,240 completed annotations out of 2,950</p>
+                        </div>
                         
-                        <li class="flex space-x-3">
-                            <div class="flex-shrink-0">
-                                <span class="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center">
-                                    <i class='bx bx-user-plus text-purple-600'></i>
-                                </span>
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-sm font-medium text-gray-700">System Load</span>
+                                <span class="text-sm font-medium text-gray-700">28%</span>
                             </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-sm font-medium text-gray-900">
-                                    New user registered
-                                </p>
-                                <p class="text-sm text-gray-500">
-                                    Sarah Johnson joined as an annotator
-                                </p>
-                                <p class="text-xs text-gray-400 mt-1">
-                                    1 day ago
-                                </p>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-amber-500 h-2.5 rounded-full" style="width: 28%"></div>
                             </div>
-                        </li>
-                    </ul>
+                            <p class="mt-2 text-xs text-gray-500">System resources are operating normally</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="px-4 py-4 sm:px-6 bg-gray-50 border-t border-gray-200">
-                    <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-500 flex items-center justify-center">
-                        View all activity
-                        <i class='bx bx-right-arrow-alt ml-1'></i>
-                    </a>
+            </div>
+            
+            <!-- Quick Actions Card -->
+            <div class="bg-white rounded-2xl shadow-sm fade-in-delay-3">
+                <div class="px-6 py-4 border-b border-gray-100">
+                    <h3 class="text-lg font-bold text-gray-900 flex items-center">
+                        <i class='bx bx-bolt-circle text-amber-500 mr-2'></i>
+                        Quick Actions
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <a th:href="@{/admin/datasets/add}" class="flex items-center p-4 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">
+                            <div class="flex-shrink-0 h-10 w-10 rounded-lg bg-teal-100 flex items-center justify-center">
+                                <i class='bx bx-plus text-teal-600'></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-900">Add Dataset</p>
+                                <p class="text-xs text-gray-500">Upload new annotation dataset</p>
+                            </div>
+                        </a>
+                        
+                        <a th:href="@{/admin/users/add}" class="flex items-center p-4 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">
+                            <div class="flex-shrink-0 h-10 w-10 rounded-lg bg-purple-100 flex items-center justify-center">
+                                <i class='bx bx-user-plus text-purple-600'></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-900">Add User</p>
+                                <p class="text-xs text-gray-500">Create new user account</p>
+                            </div>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </main>
     
     <!-- Footer -->
-    <footer class="bg-white shadow-inner mt-auto">
-        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
-            <p class="text-center text-sm text-gray-500">
-                &copy; 2023 Annotation Platform. All rights reserved.
-            </p>
-        </div>
+    <footer class="py-4 px-6 border-t border-gray-200">
+        <p class="text-center text-sm text-gray-500">
+            &copy; 2023 Annotation Platform. All rights reserved.
+        </p>
+        <p class="text-center text-xs text-gray-400 mt-1">Annotations App • v2.0</p>
     </footer>
     
     <!-- Main JavaScript -->

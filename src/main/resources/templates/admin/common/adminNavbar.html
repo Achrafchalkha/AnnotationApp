@@ -1,0 +1,40 @@
+<nav th:fragment="adminNavbar" class="bg-gradient-to-r from-purple-600 to-indigo-600 shadow-sm w-full z-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-[70px]">
+            <!-- Logo and Navigation Links -->
+            <div class="flex items-center space-x-8">
+                <div class="flex items-center">
+                    <div class="h-10 w-10 rounded-full bg-white bg-opacity-20 flex items-center justify-center">
+                        <i class='bx bx-analyse text-white text-xl'></i>
+                    </div>
+                    <span class="ml-3 text-white font-semibold text-lg">Annotations</span>
+                </div>
+                <div class="hidden md:flex space-x-2 ml-8">
+                    <a th:href="@{/admin}" class="flex items-center px-4 py-2 rounded-md text-white font-medium hover:bg-white hover:bg-opacity-10 transition menu-item">
+                        <i class='bx bxs-dashboard text-xl mr-2'></i> Dashboard
+                    </a>
+                    <a th:href="@{/admin/users}" class="flex items-center px-4 py-2 rounded-md text-white font-medium hover:bg-white hover:bg-opacity-10 transition menu-item">
+                        <i class='bx bx-user text-xl mr-2'></i> Users
+                    </a>
+                    <a th:href="@{/admin/datasets}" class="flex items-center px-4 py-2 rounded-md text-white font-medium hover:bg-white hover:bg-opacity-10 transition menu-item">
+                        <i class='bx bx-data text-xl mr-2'></i> Datasets
+                    </a>
+                    <a th:href="@{/admin/datasets/statistics}" class="flex items-center px-4 py-2 rounded-md text-white font-medium hover:bg-white hover:bg-opacity-10 transition menu-item">
+                        <i class='bx bx-line-chart text-xl mr-2'></i> Statistics
+                    </a>
+                </div>
+            </div>
+            <!-- Search, User Info, Logout -->
+            <div class="flex items-center space-x-4">
+                <div class="relative hidden md:block">
+                    <input type="text" placeholder="Search..." class="w-64 pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    <i class='bx bx-search absolute left-3 top-2.5 text-gray-400'></i>
+                </div>
+                <span class="text-sm font-medium text-white">Welcome, <span th:text="${currentUserName}">Admin</span></span>
+                <a th:href="@{/logout}" class="px-3 py-1 rounded-lg bg-white bg-opacity-20 text-white flex items-center text-sm font-medium hover:bg-opacity-40 transition">
+                    <i class='bx bx-log-out mr-1'></i> Logout
+                </a>
+            </div>
+        </div>
+    </div>
+</nav> 
