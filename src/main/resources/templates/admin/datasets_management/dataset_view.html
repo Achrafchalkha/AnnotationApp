@@ -191,21 +191,6 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            <tr th:each="task : ${tasks}" class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${task.user != null ? task.user.id : 'N/A'}">1</td>
-                                <td class="px-6 py-4 text-sm text-gray-900" th:text="${task.user != null ? (task.user.firstname + ' ' + task.user.lastname) : 'Unknown'}">John Doe</td>
-                                <td class="px-6 py-4 text-sm text-gray-900" th:text="${task.user != null ? task.user.username : 'Unknown'}">johndoe</td>
-                                <td class="px-6 py-4 text-sm text-gray-900" th:text="${task.couples != null ? task.couples.size() : 0}">10</td>
-                                <td class="px-6 py-4 text-sm text-gray-900" th:text="${#dates.format(task.dateLimite, 'yyyy-MM-dd')}">2023-12-31</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <form th:action="@{'/admin/datasets/' + ${dataset.id} + '/remove-annotator/' + ${task.user.id}}" method="post" onsubmit="return confirm('Are you sure you want to remove this annotator? All assigned tasks will be deleted.');">
-                                        <button type="submit" class="text-red-600 hover:text-red-900">
-                                            <i class='bx bx-trash'></i> Remove
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                            
                             <!-- Empty state -->
                             <tr th:if="${#lists.isEmpty(tasks)}">
                                 <td colspan="6" class="px-6 py-8 text-center text-sm text-gray-500">
@@ -216,6 +201,23 @@
                                             <i class='bx bx-user-plus mr-1'></i> Assign Annotators
                                         </a>
                                     </div>
+                                </td>
+                            </tr>
+                            
+                            <!-- Rows with tasks -->
+                            <tr th:if="${!#lists.isEmpty(tasks)}" th:each="task : ${tasks}" class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${task.user != null ? task.user.id : 'N/A'}">1</td>
+                                <td class="px-6 py-4 text-sm text-gray-900" th:text="${task.user != null ? (task.user.firstname + ' ' + task.user.lastname) : 'Unknown'}">John Doe</td>
+                                <td class="px-6 py-4 text-sm text-gray-900" th:text="${task.user != null ? task.user.username : 'Unknown'}">johndoe</td>
+                                <td class="px-6 py-4 text-sm text-gray-900" th:text="${task.couples != null ? task.couples.size() : 0}">10</td>
+                                <td class="px-6 py-4 text-sm text-gray-900" th:text="${task.dateLimite != null ? #dates.format(task.dateLimite, 'yyyy-MM-dd') : 'No deadline'}">2023-12-31</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <form th:if="${task.user != null}" th:action="@{'/admin/datasets/' + ${dataset.id} + '/remove-annotator/' + ${task.user.id}}" method="post" onsubmit="return confirm('Are you sure you want to remove this annotator? All assigned tasks will be deleted.');">
+                                        <button type="submit" class="text-red-600 hover:text-red-900">
+                                            <i class='bx bx-trash'></i> Remove
+                                        </button>
+                                    </form>
+                                    <span th:unless="${task.user != null}" class="text-gray-400">N/A</span>
                                 </td>
                             </tr>
                         </tbody>

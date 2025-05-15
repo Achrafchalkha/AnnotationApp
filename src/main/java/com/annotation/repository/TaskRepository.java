@@ -16,6 +16,31 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     @Query("SELECT t FROM Task t JOIN FETCH t.user JOIN FETCH t.dataset WHERE t.dataset.id = :datasetId")
     List<Task> findByDatasetIdWithUserAndDataset(@Param("datasetId") Long datasetId);
     
-    @Query("SELECT t FROM Task t JOIN FETCH t.couples WHERE t.id = :taskId")
+    /**
+     * Retrieves a task with all necessary relationships eagerly loaded to prevent LazyInitializationExceptions
+     */
+    @Query("SELECT DISTINCT t FROM Task t " +
+           "JOIN FETCH t.user u " +
+           "JOIN FETCH t.dataset d " +
+           "LEFT JOIN FETCH t.couples c " +
+           "LEFT JOIN FETCH d.classesPossibles " +
+           "WHERE t.id = :taskId")
     Task findByIdWithCouples(@Param("taskId") Long taskId);
+    
+    @Query("SELECT DISTINCT t FROM Task t " +
+           "LEFT JOIN FETCH t.user " +
+           "LEFT JOIN FETCH t.dataset " +
+           "LEFT JOIN FETCH t.couples " +
+           "WHERE t.dataset.id = :datasetId")
+    List<Task> findByDatasetIdWithAllRelations(@Param("datasetId") Long datasetId);
+    
+    @Query("SELECT DISTINCT t FROM Task t " +
+           "LEFT JOIN FETCH t.dataset " +
+           "LEFT JOIN FETCH t.couples " +
+           "LEFT JOIN FETCH t.user " +
+           "WHERE t.user.id = :userId")
+    List<Task> findByUserIdWithAllRelations(@Param("userId") Long userId);
+    
+    long countByDatasetId(Long datasetId);
+    long countByUserId(Long userId);
 }

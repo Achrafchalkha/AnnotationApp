@@ -40,6 +40,10 @@ public class CoupleText {
     @OneToMany(mappedBy = "coupleText", fetch = FetchType.LAZY)
     private List<Annotation> annotations = new ArrayList<>();
 
+    // To store the annotator's choice of class
+    @Column(name = "class_annotation")
+    private String classAnnotation;
+
     // Copy constructor without inheriting relationships
     public CoupleText(CoupleText couple) {
         this.text1 = couple.getText1();

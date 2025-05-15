@@ -1,88 +1,73 @@
 package com.annotation.model;
 
-import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-import java.util.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Table(name = "tasks")
+@Getter
+@Setter
+@EqualsAndHashCode(of = "id")
+@ToString(exclude = {"couples", "user"})
+@AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(of = "id") // Only use ID for equality checks
-@ToString(exclude = {"couples"}) // Exclude collections from toString to avoid circular references
 public class Task {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "date_limite", nullable = false)
     private Date dateLimite;
-
-    @ManyToOne(fetch = FetchType.EAGER) // Changed to EAGER loading for consistent behavior
+    
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user;
 
-    // Simplified relationship with CoupleText - using only ManyToMany
-    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    // Hibernate will create a join table between tasks and text pairs
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinTable(
-        name = "task_couple",      // Changed from tache_couple to task_couple for clarity
-        joinColumns = @JoinColumn(name = "task_id"),  // Changed from tache_id to task_id
+        name = "task_couple",
+        joinColumns = @JoinColumn(name = "task_id"),
         inverseJoinColumns = @JoinColumn(name = "couple_id")
     )
     private List<CoupleText> couples = new ArrayList<>();
-
-    @ManyToOne(fetch = FetchType.EAGER) // Changed to EAGER loading for consistent behavior
+    
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "dataset_id")
     private Dataset dataset;
-
-    // Constructor with essential fields
-    public Task(Date dateLimite, User user, Dataset dataset) {
-        this.dateLimite = dateLimite;
-        this.user = user;
-        this.dataset = dataset;
+    
+    // Helper methods for relationship management
+    public void addCouple(CoupleText couple) {
+        if (couples == null) {
+            couples = new ArrayList<>();
+        }
+        couples.add(couple);
     }
-
-    // Getters and setters
-    public Long getId() {
-        return id;
+    
+    public void removeCoupleText(CoupleText couple) {
+        if (couples != null) {
+            couples.remove(couple);
+        }
     }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Date getDateLimite() {
-        return dateLimite;
-    }
-
-    public void setDateLimite(Date dateLimite) {
-        this.dateLimite = dateLimite;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public List<CoupleText> getCouples() {
-        return couples;
-    }
-
-    public void setCouples(List<CoupleText> couples) {
-        this.couples = couples;
-    }
-
-    public Dataset getDataset() {
-        return dataset;
-    }
-
-    public void setDataset(Dataset dataset) {
-        this.dataset = dataset;
-    }
-}
+} 

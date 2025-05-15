@@ -91,4 +91,11 @@ public class DefaultUserServiceImpl implements DefaultUserService{
         
         return null;
     }
+
+    /**
+     * Find a user by their username
+     */
+    public User findUserByUsername(String username) {
+        return userRepo.findByUsername(username).orElse(null);
+    }
 }

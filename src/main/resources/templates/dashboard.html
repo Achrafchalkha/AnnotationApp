@@ -38,7 +38,7 @@
                     <a href="#" class="text-white hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
                         <i class='bx bxs-dashboard mr-1'></i> Dashboard
                     </a>
-                    <a href="#" class="text-white hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
+                    <a th:href="@{/user/tasks}" class="text-white hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
                         <i class='bx bx-task mr-1'></i> My Tasks
                     </a>
                     <div class="relative ml-3">
@@ -72,7 +72,7 @@
                 <a href="#" class="text-white hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">
                     <i class='bx bxs-dashboard mr-1'></i> Dashboard
                 </a>
-                <a href="#" class="text-white hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">
+                <a th:href="@{/user/tasks}" class="text-white hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">
                     <i class='bx bx-task mr-1'></i> My Tasks
                 </a>
                 <a th:href="@{/logout}" class="text-white hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">
@@ -119,8 +119,8 @@
                                         Total Tasks
                                     </dt>
                                     <dd>
-                                        <div class="text-lg font-medium text-gray-900">
-                                            12
+                                        <div class="text-lg font-medium text-gray-900" th:text="${tasks != null ? tasks.size() : 0}">
+                                            0
                                         </div>
                                     </dd>
                                 </dl>
@@ -129,7 +129,7 @@
                     </div>
                     <div class="bg-gray-50 px-4 py-4 sm:px-6">
                         <div class="text-sm">
-                            <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">
+                            <a th:href="@{/user/tasks}" class="font-medium text-indigo-600 hover:text-indigo-500">
                                 View all tasks<span class="sr-only"> Total Tasks</span>
                             </a>
                         </div>
@@ -149,8 +149,8 @@
                                         Completed Tasks
                                     </dt>
                                     <dd>
-                                        <div class="text-lg font-medium text-gray-900">
-                                            8
+                                        <div class="text-lg font-medium text-gray-900" th:text="${completedTasks != null ? completedTasks : 0}">
+                                            0
                                         </div>
                                     </dd>
                                 </dl>
@@ -159,7 +159,7 @@
                     </div>
                     <div class="bg-gray-50 px-4 py-4 sm:px-6">
                         <div class="text-sm">
-                            <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">
+                            <a th:href="@{/user/tasks}" class="font-medium text-indigo-600 hover:text-indigo-500">
                                 View completed<span class="sr-only"> Completed Tasks</span>
                             </a>
                         </div>
@@ -179,8 +179,8 @@
                                         Pending Tasks
                                     </dt>
                                     <dd>
-                                        <div class="text-lg font-medium text-gray-900">
-                                            4
+                                        <div class="text-lg font-medium text-gray-900" th:text="${pendingTasks != null ? pendingTasks : 0}">
+                                            0
                                         </div>
                                     </dd>
                                 </dl>
@@ -189,7 +189,7 @@
                     </div>
                     <div class="bg-gray-50 px-4 py-4 sm:px-6">
                         <div class="text-sm">
-                            <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">
+                            <a th:href="@{/user/tasks}" class="font-medium text-indigo-600 hover:text-indigo-500">
                                 View pending<span class="sr-only"> Pending Tasks</span>
                             </a>
                         </div>
@@ -198,23 +198,119 @@
             </div>
             
             <!-- Recent activity -->
-            <div class="bg-white shadow-sm rounded-lg should-animate">
+            <div class="bg-white shadow-sm rounded-lg should-animate mb-8">
                 <div class="px-4 py-5 sm:px-6">
                     <h3 class="text-lg leading-6 font-medium text-gray-900">
-                        Recent Activity
+                        Recent Tasks
                     </h3>
                     <p class="mt-1 max-w-2xl text-sm text-gray-500">
-                        Your latest annotation activities.
+                        Your latest annotation tasks.
                     </p>
                 </div>
                 <div class="border-t border-gray-200">
-                    <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm font-medium text-gray-500">
-                            No recent activities
-                        </dt>
-                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                            Start annotating to see your activity here.
-                        </dd>
+                    <!-- If there are tasks, show them in a table -->
+                    <div th:if="${tasks != null && !tasks.empty}" class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dataset</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deadline</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Size</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr th:each="task, stat : ${tasks}" th:if="${stat.index < 5}">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        #<span th:text="${task.id}"></span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        <span th:text="${task.dataset != null ? task.dataset.name : 'Unknown Dataset'}"></span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        <span th:text="${#dates.format(task.dateLimite, 'yyyy-MM-dd')}"></span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        <span th:text="${task.couples != null ? task.couples.size() : 0}"></span> pairs
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="w-full bg-gray-200 rounded-full h-2.5 mr-2" style="width: 100px;">
+                                                <div class="bg-blue-600 h-2.5 rounded-full" th:style="'width: ' + ${(taskProgress != null && taskProgress.containsKey(task.id) ? taskProgress.get(task.id) : 0) + '%'}"></div>
+                                            </div>
+                                            <span class="text-sm text-gray-900" th:text="${(taskProgress != null && taskProgress.containsKey(task.id) ? taskProgress.get(task.id) : 0) + '%'}">0%</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <a th:href="@{'/user/tasks/' + ${task.id} + '/direct-access'}" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none">
+                                            Work on Task
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- If there are no tasks -->
+                    <div th:if="${tasks == null || tasks.empty}" class="px-4 py-5 sm:px-6">
+                        <div class="text-center py-5">
+                            <i class='bx bx-calendar-x text-gray-400 text-5xl mb-3'></i>
+                            <p class="text-sm text-gray-500">No tasks assigned to you yet.</p>
+                            <p class="text-xs text-gray-400 mt-1">Tasks will appear here when an administrator assigns them to you.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- View all tasks button at the bottom -->
+                    <div th:if="${tasks != null && !tasks.empty && tasks.size() > 5}" class="bg-gray-50 px-4 py-3 sm:px-6 text-center">
+                        <a th:href="@{/user/tasks}" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none">
+                            View all tasks
+                            <i class='bx bx-right-arrow-alt ml-2'></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tips for annotators -->
+            <div class="bg-white shadow-sm rounded-lg should-animate">
+                <div class="px-4 py-5 sm:px-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">
+                        Annotation Tips
+                    </h3>
+                    <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                        Quick tips to help you with your annotation tasks.
+                    </p>
+                </div>
+                <div class="border-t border-gray-200 px-4 py-5 sm:p-6">
+                    <div class="space-y-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class='bx bx-check text-green-500 text-xl'></i>
+                            </div>
+                            <div class="ml-3">
+                                <h4 class="text-sm font-medium text-gray-900">Take your time</h4>
+                                <p class="mt-1 text-sm text-gray-500">Quality is more important than speed. Carefully read each text pair before annotating.</p>
+                            </div>
+                        </div>
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class='bx bx-check text-green-500 text-xl'></i>
+                            </div>
+                            <div class="ml-3">
+                                <h4 class="text-sm font-medium text-gray-900">Be consistent</h4>
+                                <p class="mt-1 text-sm text-gray-500">Try to apply the same reasoning to similar pairs to maintain consistency across annotations.</p>
+                            </div>
+                        </div>
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class='bx bx-check text-green-500 text-xl'></i>
+                            </div>
+                            <div class="ml-3">
+                                <h4 class="text-sm font-medium text-gray-900">Take breaks</h4>
+                                <p class="mt-1 text-sm text-gray-500">Annotation can be mentally taxing. Take regular breaks to maintain focus and quality.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

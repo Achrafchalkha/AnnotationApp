@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Annotation Tasks</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <!-- Navigation -->
+        <nav class="bg-blue-600">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <h1 class="text-white font-bold">Annotation App</h1>
+                        </div>
+                        <div class="hidden md:block">
+                            <div class="ml-10 flex items-baseline space-x-4">
+                                <a th:href="@{/user/tasks}" class="bg-blue-700 text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
+                                    <i class="fas fa-tasks mr-2"></i> My Tasks
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="ml-4 flex items-center md:ml-6">
+                            <div class="ml-3 relative">
+                                <span class="text-white" th:text="${currentUser != null ? currentUser.getFirstname() + ' ' + currentUser.getLastname() : 'User'}"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main content -->
+        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <!-- Alert Messages -->
+            <div th:if="${errorMessage}" class="mb-4">
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                    <span class="block sm:inline" th:text="${errorMessage}"></span>
+                </div>
+            </div>
+            <div th:if="${success}" class="mb-4">
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                    <span class="block sm:inline" th:text="${success}"></span>
+                </div>
+            </div>
+
+            <!-- Page header -->
+            <div class="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6 mb-5">
+                <div class="md:flex md:items-center md:justify-between">
+                    <div class="flex-1 min-w-0">
+                        <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+                            My Annotation Tasks
+                        </h2>
+                        <p class="mt-1 text-sm text-gray-500">
+                            Below are all the annotation tasks assigned to you. Click "Work" to start annotating text pairs.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tasks list -->
+            <div class="mt-4">
+                <div class="bg-white shadow overflow-hidden sm:rounded-md">
+                    <ul class="divide-y divide-gray-200" th:if="${!tasks.empty}">
+                        <li th:each="task : ${tasks}">
+                            <div class="px-4 py-4 flex items-center sm:px-6">
+                                <div class="min-w-0 flex-1 sm:flex sm:items-center sm:justify-between">
+                                    <div>
+                                        <div class="flex text-sm">
+                                            <p class="font-medium text-blue-600 truncate" th:text="${'Task #' + task.id}"></p>
+                                            <p class="ml-1 flex-shrink-0 font-normal text-gray-500">
+                                                from <span class="text-gray-900 font-medium" th:text="${task.dataset != null ? task.dataset.name : 'Unknown dataset'}"></span>
+                                            </p>
+                                        </div>
+                                        <div class="mt-2 flex">
+                                            <div class="flex items-center text-sm text-gray-500">
+                                                <i class="fas fa-calendar flex-shrink-0 mr-1.5 text-gray-400"></i>
+                                                <p>
+                                                    Deadline: <span th:text="${#dates.format(task.dateLimite, 'yyyy-MM-dd')}"></span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2 flex">
+                                            <div class="flex items-center text-sm text-gray-500">
+                                                <i class="fas fa-file-alt flex-shrink-0 mr-1.5 text-gray-400"></i>
+                                                <p>
+                                                    <span th:text="${task.couples != null ? task.couples.size() : 0}"></span> text pairs to annotate
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <!-- Progress bar -->
+                                        <div class="mt-2 w-full bg-gray-200 rounded-full h-2.5">
+                                            <div class="bg-blue-600 h-2.5 rounded-full" th:style="'width: ' + ${(taskProgress.containsKey(task.id) ? taskProgress.get(task.id) : 0) + '%'}"></div>
+                                        </div>
+                                        <div class="mt-1 flex justify-between">
+                                            <span class="text-xs text-gray-500">Progress</span>
+                                            <span class="text-xs text-gray-500" th:text="${(taskProgress.containsKey(task.id) ? taskProgress.get(task.id) : 0) + '%'}">0%</span>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 flex-shrink-0 sm:mt-0 sm:ml-5">
+                                        <a th:href="@{'/user/tasks/' + ${task.id} + '/direct-access'}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                            <i class="fas fa-play mr-2"></i> Work
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    <!-- Empty state -->
+                    <div th:if="${tasks.empty}" class="text-center py-12">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                        <h3 class="mt-2 text-sm font-medium text-gray-900">No tasks</h3>
+                        <p class="mt-1 text-sm text-gray-500">You don't have any annotation tasks assigned to you yet.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
