@@ -33,6 +33,9 @@ import com.annotation.repository.RoleRepository;
 import com.annotation.repository.TaskRepository;
 import com.annotation.service.TaskAssignmentService;
 import com.annotation.repository.DatasetRepository;
+import com.annotation.repository.AnnotationRepository;
+import com.annotation.model.ClassPossible;
+import com.annotation.model.Annotation;
 
 @Controller
 @RequestMapping("/admin")
@@ -47,6 +50,7 @@ public class DatasetController {
     private final TaskRepository taskRepository;
     private final TaskAssignmentService taskAssignmentService;
     private final DatasetRepository datasetRepository;
+    private final AnnotationRepository annotationRepository;
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -61,7 +65,8 @@ public class DatasetController {
         RoleRepository roleRepository,
         TaskRepository taskRepository,
         TaskAssignmentService taskAssignmentService,
-        DatasetRepository datasetRepository) {
+        DatasetRepository datasetRepository,
+        AnnotationRepository annotationRepository) {
         this.datasetService = datasetService;
         this.coupleTextService = coupleTextService;
         this.asyncDatasetParserService = asyncDatasetParserService;
@@ -71,6 +76,7 @@ public class DatasetController {
         this.taskRepository = taskRepository;
         this.taskAssignmentService = taskAssignmentService;
         this.datasetRepository = datasetRepository;
+        this.annotationRepository = annotationRepository;
     }
 
     @GetMapping("/datasets")
@@ -912,11 +918,14 @@ public class DatasetController {
                 if (task.getCouples() != null) {
                     taskInfo.put("coupleCount", task.getCouples().size());
                     
-                    // Check if any couples have issues
-                    long invalidCouples = task.getCouples().stream()
-                        .filter(c -> c.getId() == null || c.getDataset() == null)
-                        .count();
-                    taskInfo.put("invalidCouples", invalidCouples);
+                    // Count annotated pairs in this task using the same logic as in AnnotationTaskController
+                    long totalAnnotatedPairs = 0;
+                    for (CoupleText pair : task.getCouples()) {
+                        if (pair.getClassAnnotation() != null && !pair.getClassAnnotation().isEmpty()) {
+                            totalAnnotatedPairs++;
+                        }
+                    }
+                    taskInfo.put("annotatedCoupleCount", totalAnnotatedPairs);
                 } else {
                     taskInfo.put("coupleCount", 0);
                     taskInfo.put("couplesNull", true);
@@ -1077,5 +1086,125 @@ public class DatasetController {
         }
         
         return result;
+    }
+
+    /**
+     * Display dataset statistics
+     */
+    @GetMapping("/datasets/statistics")
+    public String showDatasetStatistics(Model model) {
+        String currentUserName = StringUtils.capitalize(userService.getCurrentUserName());
+        model.addAttribute("currentUserName", currentUserName);
+        
+        List<Dataset> datasets = datasetService.findAllDatasets();
+        List<Map<String, Object>> datasetStats = new ArrayList<>();
+        
+        for (Dataset dataset : datasets) {
+            Map<String, Object> stats = new HashMap<>();
+            
+            // Get dataset basic info
+            stats.put("id", dataset.getId());
+            stats.put("name", dataset.getName());
+            System.out.println("Calculating statistics for dataset: " + dataset.getName() + " (ID: " + dataset.getId() + ")");
+            
+            // Get text pair count
+            long textPairCount = coupleTextService.countCoupleTextsByDatasetId(dataset.getId());
+            stats.put("textPairCount", textPairCount);
+            System.out.println("Total text pairs: " + textPairCount);
+            
+            // Get possible classes
+            Set<ClassPossible> classesPossibles = dataset.getClassesPossibles();
+            List<String> classes = classesPossibles.stream()
+                .map(ClassPossible::getTextClass)
+                .collect(Collectors.toList());
+            stats.put("possibleClasses", classes);
+            System.out.println("Possible classes: " + classes);
+            
+            // Get all tasks for this dataset
+            List<Task> tasks = taskRepository.findByDatasetIdWithAllRelations(dataset.getId());
+            int annotatorCount = (int) tasks.stream()
+                .map(task -> task.getUser() != null ? task.getUser().getId() : null)
+                .filter(Objects::nonNull)
+                .distinct()
+                .count();
+            stats.put("annotatorCount", annotatorCount);
+            System.out.println("Number of annotators: " + annotatorCount);
+            
+            // Calculate progress percentage based on annotated text pairs
+            if (textPairCount > 0 && !tasks.isEmpty()) {
+                // Count total annotated text pairs across all tasks
+                long totalAnnotatedPairs = 0;
+                long totalAssignedPairs = 0;
+                
+                System.out.println("Analyzing " + tasks.size() + " tasks:");
+                for (Task task : tasks) {
+                    if (task.getCouples() != null) {
+                        int taskCoupleCount = task.getCouples().size();
+                        totalAssignedPairs += taskCoupleCount;
+                        
+                        // Count annotated pairs in this task
+                        int annotatedInTask = 0;
+                        for (CoupleText pair : task.getCouples()) {
+                            // Check if this text pair has been annotated
+                            if (pair.getClassAnnotation() != null && !pair.getClassAnnotation().isEmpty()) {
+                                totalAnnotatedPairs++;
+                                annotatedInTask++;
+                            }
+                        }
+                        
+                        System.out.println("  Task ID " + task.getId() + 
+                                         " (User: " + (task.getUser() != null ? task.getUser().getUsername() : "none") + "): " + 
+                                         annotatedInTask + " annotated out of " + taskCoupleCount + " assigned");
+                    }
+                }
+                
+                // Calculate progress percentage
+                double progressPercentage = totalAssignedPairs > 0 ? 
+                    ((double) totalAnnotatedPairs / totalAssignedPairs) * 100 : 0;
+                
+                // If no annotations were found using classAnnotation field, try using the annotations table directly
+                if (totalAnnotatedPairs == 0) {
+                    System.out.println("No annotations found using classAnnotation field, checking annotations table directly...");
+                    try {
+                        // Count annotations using direct SQL query
+                        Query countQuery = entityManager.createNativeQuery(
+                            "SELECT COUNT(DISTINCT CONCAT(a.user_id, '_', a.couple_id)) " +
+                            "FROM annotation a " +
+                            "JOIN couple_text c ON a.couple_id = c.id " +
+                            "WHERE c.dataset_id = :datasetId");
+                        countQuery.setParameter("datasetId", dataset.getId());
+                        Number result = (Number) countQuery.getSingleResult();
+                        totalAnnotatedPairs = result != null ? result.longValue() : 0;
+                        
+                        // Recalculate progress percentage
+                        progressPercentage = totalAssignedPairs > 0 ? 
+                            ((double) totalAnnotatedPairs / totalAssignedPairs) * 100 : 0;
+                        
+                        System.out.println("Direct database check: " + totalAnnotatedPairs + " annotated pairs found");
+                    } catch (Exception e) {
+                        System.out.println("Error checking annotations directly: " + e.getMessage());
+                    }
+                }
+                
+                stats.put("progressPercentage", Math.round(progressPercentage * 10) / 10.0); // Round to 1 decimal place
+                stats.put("completedAnnotations", totalAnnotatedPairs);
+                stats.put("totalExpectedAnnotations", totalAssignedPairs);
+                
+                System.out.println("Progress calculation: " + totalAnnotatedPairs + " annotated out of " + 
+                                 totalAssignedPairs + " assigned = " + Math.round(progressPercentage * 10) / 10.0 + "%");
+            } else {
+                stats.put("progressPercentage", 0.0);
+                stats.put("completedAnnotations", 0);
+                stats.put("totalExpectedAnnotations", 0);
+                System.out.println("No progress to calculate (no tasks or text pairs)");
+            }
+            
+            datasetStats.add(stats);
+            System.out.println("------------------------------");
+        }
+        
+        model.addAttribute("datasetStats", datasetStats);
+        
+        return "admin/datasets_management/dataset_statistics";
     }
 }
