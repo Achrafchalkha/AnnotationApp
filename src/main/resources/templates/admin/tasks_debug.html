@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasks Debug - Admin Dashboard</title>
+    
+    <!-- Tailwind CSS -->
+    <link rel="stylesheet" th:href="@{/css/tailwind.css}">
+    
+    <!-- Boxicons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    
+    <!-- Google Fonts - Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-7xl mx-auto bg-white p-6 rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold mb-4">Tasks Debug Page</h1>
+        
+        <div class="mb-6 bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4">
+            <p>This is a debug page to verify template rendering.</p>
+            <p th:if="${testMessage != null}">Test message: <span th:text="${testMessage}">None</span></p>
+        </div>
+        
+        <div class="mb-6">
+            <h2 class="text-xl font-semibold mb-2">Debug Information</h2>
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <p>Current user: <span th:text="${currentUserName != null ? currentUserName : 'Unknown'}">Unknown</span></p>
+                <p>Tasks count: <span th:text="${allTasks != null ? allTasks.size() : 'No tasks available'}">0</span></p>
+                <p>Task progress entries: <span th:text="${taskProgress != null ? taskProgress.size() : 'No progress data'}">0</span></p>
+                <p>Datasets: <span th:text="${datasets != null ? datasets.size() : 'No datasets'}">0</span></p>
+            </div>
+        </div>
+        
+        <div th:if="${errorMessage != null}" class="mb-6 bg-red-100 border-l-4 border-red-500 text-red-700 p-4">
+            <h2 class="text-xl font-semibold mb-2">Error</h2>
+            <p th:text="${errorMessage}">No error message</p>
+        </div>
+        
+        <div class="mb-6" th:if="${allTasks != null && !allTasks.empty}">
+            <h2 class="text-xl font-semibold mb-2">Tasks List (Basic)</h2>
+            <ul class="bg-gray-50 p-4 rounded-lg">
+                <li th:each="task : ${allTasks}" class="mb-2 p-2 border-b border-gray-200">
+                    Task #<span th:text="${task.id}">123</span> - 
+                    User: <span th:text="${task.user != null ? task.user.getFirstname() : 'Unassigned'}">Unknown</span>,
+                    Dataset: <span th:text="${task.dataset != null ? task.dataset.name : 'Unknown'}">Unknown</span>,
+                    Couples: <span th:text="${task.couples != null ? task.couples.size() : 0}">0</span>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="text-center mt-8">
+            <a th:href="@{/admin}" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">Back to Dashboard</a>
+        </div>
+    </div>
+</body>
+</html> 

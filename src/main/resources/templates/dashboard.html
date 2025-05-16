@@ -115,7 +115,8 @@
                                 Welcome, <span th:text="${userDetails}" class="font-semibold">User</span>!
                             </h3>
                             <p class="mt-1 max-w-2xl text-sm text-gray-500">
-                                You are logged in as a standard user. Here's your dashboard overview.
+                                <span th:if="${!isAdmin}">You are logged in as a standard user. Here's your dashboard overview.</span>
+                                <span th:if="${isAdmin}">You are logged in as an admin. You can see all tasks in the system.</span>
                             </p>
                         </div>
                     </div>
@@ -219,10 +220,12 @@
             <div class="bg-white shadow-sm rounded-lg should-animate mb-8">
                 <div class="px-4 py-5 sm:px-6">
                     <h3 class="text-lg leading-6 font-medium text-gray-900">
-                        Recent Tasks
+                        <span th:if="${!isAdmin}">Recent Tasks</span>
+                        <span th:if="${isAdmin}">All Tasks</span>
                     </h3>
                     <p class="mt-1 max-w-2xl text-sm text-gray-500">
-                        Your latest annotation tasks.
+                        <span th:if="${!isAdmin}">Your latest annotation tasks.</span>
+                        <span th:if="${isAdmin}">All annotation tasks in the system.</span>
                     </p>
                 </div>
                 <div class="border-t border-gray-200">
@@ -233,6 +236,7 @@
                                 <tr>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dataset</th>
+                                    <th th:if="${isAdmin}" scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Annotator</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deadline</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Size</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
@@ -240,12 +244,15 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                <tr th:each="task, stat : ${tasks}" th:if="${stat.index < 5}">
+                                <tr th:each="task, stat : ${tasks}" th:if="${!isAdmin && stat.index < 5 || isAdmin}">
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         #<span th:text="${task.id}"></span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         <span th:text="${task.dataset != null ? task.dataset.name : 'Unknown Dataset'}"></span>
+                                    </td>
+                                    <td th:if="${isAdmin}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        <span th:text="${task.user != null ? task.user.getFirstname() + ' ' + task.user.getLastname() : 'Unassigned'}"></span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         <span th:text="${#dates.format(task.dateLimite, 'yyyy-MM-dd')}"></span>
@@ -281,7 +288,7 @@
                     </div>
                     
                     <!-- View all tasks button at the bottom -->
-                    <div th:if="${tasks != null && !tasks.empty && tasks.size() > 5}" class="bg-gray-50 px-4 py-3 sm:px-6 text-center">
+                    <div th:if="${!isAdmin && tasks != null && !tasks.empty && tasks.size() > 5}" class="bg-gray-50 px-4 py-3 sm:px-6 text-center">
                         <a th:href="@{/user/tasks}" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none">
                             View all tasks
                             <i class='bx bx-right-arrow-alt ml-2'></i>
@@ -376,6 +383,12 @@
                         userDropdown.classList.add('hidden');
                     }
                 });
+            }
+            
+            // Additional JS for admin dashboard if needed
+            const isAdmin = /*[[${isAdmin}]]*/ false;
+            if (isAdmin) {
+                console.log("Admin dashboard loaded");
             }
         });
     </script>

@@ -35,12 +35,30 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findByDatasetIdWithAllRelations(@Param("datasetId") Long datasetId);
     
     @Query("SELECT DISTINCT t FROM Task t " +
+           "LEFT JOIN FETCH t.user " +
            "LEFT JOIN FETCH t.dataset " +
            "LEFT JOIN FETCH t.couples " +
-           "LEFT JOIN FETCH t.user " +
            "WHERE t.user.id = :userId")
     List<Task> findByUserIdWithAllRelations(@Param("userId") Long userId);
     
     long countByDatasetId(Long datasetId);
     long countByUserId(Long userId);
+
+    @Query("SELECT DISTINCT t FROM Task t " +
+           "LEFT JOIN FETCH t.user " +
+           "LEFT JOIN FETCH t.dataset " +
+           "LEFT JOIN FETCH t.couples " +
+           "LEFT JOIN FETCH t.dataset.classesPossibles " +
+           "ORDER BY t.id")
+    List<Task> findAllWithRelationships();
+
+    @Query(value = "SELECT t.* FROM tasks t", nativeQuery = true)
+    List<Task> findAllTasksNative();
+
+    @Query("SELECT DISTINCT t FROM Task t " +
+           "LEFT JOIN FETCH t.user " +
+           "LEFT JOIN FETCH t.dataset " +
+           "LEFT JOIN FETCH t.couples " +
+           "LEFT JOIN FETCH t.dataset.classesPossibles")
+    List<Task> findAllWithoutOrder();
 }

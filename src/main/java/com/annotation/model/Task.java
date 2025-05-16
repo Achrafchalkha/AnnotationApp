@@ -16,6 +16,9 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.SqlResultSetMapping;
+import jakarta.persistence.ConstructorResult;
+import jakarta.persistence.ColumnResult;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -31,6 +34,18 @@ import lombok.ToString;
 @ToString(exclude = {"couples", "user"})
 @AllArgsConstructor
 @NoArgsConstructor
+@SqlResultSetMapping(
+    name = "TaskDetailMapping",
+    columns = {
+        @ColumnResult(name = "id", type = Long.class),
+        @ColumnResult(name = "date_limite", type = Date.class),
+        @ColumnResult(name = "user_id", type = Long.class),
+        @ColumnResult(name = "dataset_id", type = Long.class),
+        @ColumnResult(name = "firstname", type = String.class),
+        @ColumnResult(name = "lastname", type = String.class),
+        @ColumnResult(name = "dataset_name", type = String.class)
+    }
+)
 public class Task {
 
     @Id
