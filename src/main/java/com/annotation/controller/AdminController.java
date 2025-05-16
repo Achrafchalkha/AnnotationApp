@@ -31,8 +31,8 @@ public class AdminController {
     // Affichage du dashboard admin
     @GetMapping
     public String displayDashboard(Model model) {
-        String user = returnUsername();
-        model.addAttribute("userDetails", user);
+        String username = returnUsername();
+        model.addAttribute("currentUserName", username);
         return "admin/adminScreen";
     }
 

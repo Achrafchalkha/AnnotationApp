@@ -11,82 +11,19 @@
     <!-- Boxicons -->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     
-    <!-- Google Fonts - Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts - Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f9fafb;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fe;
         }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
-    <!-- Navbar -->
-    <nav class="bg-gradient-to-r from-blue-600 to-indigo-700 shadow-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 flex items-center">
-                        <i class='bx bx-analyse text-white text-2xl mr-2'></i>
-                        <span class="text-white font-bold text-xl">Annotation Platform</span>
-                    </div>
-                </div>
-                
-                <!-- Desktop Navigation -->
-                <div class="hidden md:flex md:items-center md:space-x-4">
-                    <a th:href="@{/admin}" class="text-white hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
-                        <i class='bx bxs-dashboard mr-1'></i> Dashboard
-                    </a>
-                    <a th:href="@{/admin/datasets}" class="bg-blue-700 text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
-                        <i class='bx bx-data mr-1'></i> Datasets
-                    </a>
-                    <a th:href="@{/admin/users}" class="text-white hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
-                        <i class='bx bx-user mr-1'></i> Users
-                    </a>
-                    <div class="relative ml-3">
-                        <div>
-                            <button type="button" class="flex items-center text-white hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" id="user-menu-button" aria-expanded="false" aria-haspopup="true" data-dropdown-toggle="user-dropdown">
-                                <i class='bx bx-user-circle mr-1'></i>
-                                <span th:text="${currentUserName}">User</span>
-                                <i class='bx bx-chevron-down ml-1'></i>
-                            </button>
-                        </div>
-                        <div class="hidden origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5" id="user-dropdown">
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your Profile</a>
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
-                            <a th:href="@{/logout}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign out</a>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Mobile menu button -->
-                <div class="flex items-center md:hidden">
-                    <button type="button" class="text-white hover:bg-blue-700 hover:text-white inline-flex items-center justify-center p-2 rounded-md" id="mobile-menu-button">
-                        <i class='bx bx-menu text-2xl'></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Mobile menu -->
-        <div class="hidden md:hidden bg-blue-800" id="mobile-menu">
-            <div class="px-2 pt-2 pb-3 space-y-1">
-                <a th:href="@{/admin}" class="text-white hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">
-                    <i class='bx bxs-dashboard mr-1'></i> Dashboard
-                </a>
-                <a th:href="@{/admin/datasets}" class="bg-blue-700 text-white block px-3 py-2 rounded-md text-base font-medium">
-                    <i class='bx bx-data mr-1'></i> Datasets
-                </a>
-                <a th:href="@{/admin/users}" class="text-white hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">
-                    <i class='bx bx-user mr-1'></i> Users
-                </a>
-                <a th:href="@{/logout}" class="text-white hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">
-                    <i class='bx bx-log-out mr-1'></i> Sign out
-                </a>
-            </div>
-        </div>
-    </nav>
+    <!-- Import Admin Navbar Fragment -->
+    <div th:replace="~{admin/common/adminNavbar :: adminNavbar}"></div>
     
     <!-- Flash messages -->
     <div th:if="${success}" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
@@ -134,10 +71,10 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-bold text-gray-900 flex items-center">
-                    <i class='bx bx-data text-blue-600 mr-2 text-3xl'></i>
+                    <i class='bx bx-data text-purple-600 mr-2 text-3xl'></i>
                     Datasets Management
                 </h1>
-                <a th:href="@{/admin/datasets/add}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <a th:href="@{/admin/datasets/add}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
                     <i class='bx bx-plus mr-1'></i>
                     Add New Dataset
                 </a>
@@ -150,7 +87,7 @@
                         <div class="px-4 py-4 sm:px-6 hover:bg-gray-50 transition-colors duration-150">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center">
-                                    <div class="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-md bg-blue-100 text-blue-600">
+                                    <div class="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-md bg-purple-100 text-purple-600">
                                         <i class='bx bx-spreadsheet text-xl'></i>
                                     </div>
                                     <div class="ml-4">
@@ -163,7 +100,7 @@
                                     </div>
                                 </div>
                                 <div class="flex space-x-2">
-                                    <a th:href="@{'/admin/datasets/details/' + ${dataset.id}}" class="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                    <a th:href="@{'/admin/datasets/details/' + ${dataset.id}}" class="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-purple-700 bg-purple-100 hover:bg-purple-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
                                         <i class='bx bx-show mr-1'></i> View
                                     </a>
                                     <a th:href="@{'/admin/datasets/assign-annotators/' + ${dataset.id}}" class="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-green-700 bg-green-100 hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
@@ -207,7 +144,7 @@
                                 Get started by creating a new dataset.
                             </p>
                             <div class="mt-6">
-                                <a th:href="@{/admin/datasets/add}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <a th:href="@{/admin/datasets/add}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
                                     <i class='bx bx-plus mr-1'></i>
                                     Add New Dataset
                                 </a>

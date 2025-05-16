@@ -11,107 +11,89 @@
     <!-- Boxicons -->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     
-    <!-- Google Fonts - Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts - Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f9fafb;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fe;
+        }
+        
+        .stats-card {
+            transition: all 0.3s ease;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .main-card {
+            transition: all 0.3s ease;
+        }
+        
+        .main-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-arrow {
+            transition: transform 0.3s ease;
+        }
+        
+        .main-card:hover .card-arrow {
+            transform: translateX(5px);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        .fade-in-delay-1 {
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+            animation-delay: 0.2s;
+        }
+        
+        .fade-in-delay-2 {
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+            animation-delay: 0.4s;
         }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
-    <!-- Navbar -->
-    <nav class="bg-gradient-to-r from-blue-600 to-indigo-700 shadow-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 flex items-center">
-                        <i class='bx bx-analyse text-white text-2xl mr-2'></i>
-                        <span class="text-white font-bold text-xl">Annotation Platform</span>
-                    </div>
-                </div>
-                
-                <!-- Desktop Navigation -->
-                <div class="hidden md:flex md:items-center md:space-x-4">
-                    <a th:href="@{/admin}" class="text-white hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
-                        <i class='bx bxs-dashboard mr-1'></i> Dashboard
-                    </a>
-                    <a th:href="@{/admin/datasets}" class="text-white hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
-                        <i class='bx bx-data mr-1'></i> Datasets
-                    </a>
-                    <a th:href="@{/admin/users}" class="bg-blue-700 text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
-                        <i class='bx bx-user mr-1'></i> Users
-                    </a>
-                    <div class="relative ml-3">
-                        <div>
-                            <button type="button" class="flex items-center text-white hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" id="user-menu-button" aria-expanded="false" aria-haspopup="true" data-dropdown-toggle="user-dropdown">
-                                <i class='bx bx-user-circle mr-1'></i>
-                                <span th:text="${currentUserName}">Admin</span>
-                                <i class='bx bx-chevron-down ml-1'></i>
-                            </button>
-                        </div>
-                        <div class="hidden origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5" id="user-dropdown">
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your Profile</a>
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
-                            <a th:href="@{/logout}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign out</a>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Mobile menu button -->
-                <div class="flex items-center md:hidden">
-                    <button type="button" class="text-white hover:bg-blue-700 hover:text-white inline-flex items-center justify-center p-2 rounded-md" id="mobile-menu-button">
-                        <i class='bx bx-menu text-2xl'></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Mobile menu -->
-        <div class="hidden md:hidden bg-blue-800" id="mobile-menu">
-            <div class="px-2 pt-2 pb-3 space-y-1">
-                <a th:href="@{/admin}" class="text-white hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">
-                    <i class='bx bxs-dashboard mr-1'></i> Dashboard
-                </a>
-                <a th:href="@{/admin/datasets}" class="text-white hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">
-                    <i class='bx bx-data mr-1'></i> Datasets
-                </a>
-                <a th:href="@{/admin/users}" class="bg-blue-700 text-white block px-3 py-2 rounded-md text-base font-medium">
-                    <i class='bx bx-user mr-1'></i> Users
-                </a>
-                <a th:href="@{/logout}" class="text-white hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">
-                    <i class='bx bx-log-out mr-1'></i> Sign out
-                </a>
-            </div>
-        </div>
-    </nav>
+    <!-- Import Admin Navbar Fragment -->
+    <div th:replace="~{admin/common/adminNavbar :: adminNavbar}"></div>
     
     <!-- Main content -->
     <main class="flex-grow py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Header -->
-            <div class="md:flex md:items-center md:justify-between mb-6">
-                <div class="flex-1 min-w-0">
-                    <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:leading-9 flex items-center">
-                        <i class='bx bx-user-plus text-purple-600 mr-2'></i>
-                        Add New Annotator
-                    </h2>
-                    <p class="mt-1 text-sm text-gray-500">
-                        Create a new user account with annotator privileges
-                    </p>
-                </div>
-                <div class="mt-4 flex md:mt-0 md:ml-4">
-                    <a th:href="@{/admin/users}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <!-- Header Section -->
+            <div class="mb-6 fade-in">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900 flex items-center">
+                            <i class='bx bx-user-plus text-purple-600 mr-2 text-3xl'></i>
+                            Add New Annotator
+                        </h1>
+                        <p class="mt-1 text-gray-600">Create a new user account with annotator privileges</p>
+                    </div>
+                    <a th:href="@{/admin/users}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-150 ease-in-out">
                         <i class='bx bx-arrow-back mr-1'></i>
-                        Back to List
+                        Back to Users
                     </a>
                 </div>
             </div>
             
             <!-- Error Messages -->
-            <div th:if="${error}" class="rounded-md bg-red-50 p-4 mb-6">
+            <div th:if="${error}" class="rounded-xl bg-red-50 p-4 mb-6 fade-in-delay-1 shadow-sm border-l-4 border-red-500">
                 <div class="flex">
                     <div class="flex-shrink-0">
                         <i class='bx bx-error-circle text-red-400 text-xl'></i>
@@ -130,26 +112,30 @@
             </div>
 
             <!-- Add Annotator Form -->
-            <div class="bg-white shadow overflow-hidden rounded-lg mb-8">
-                <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900 flex items-center">
-                        <i class='bx bx-user-voice text-purple-600 mr-2'></i>
-                        Annotator Information
-                    </h3>
+            <div class="bg-white shadow-sm overflow-hidden rounded-2xl mb-8 border-t-4 border-purple-500 fade-in-delay-1">
+                <div class="px-6 py-5 border-b border-gray-200">
+                    <div class="flex items-center">
+                        <div class="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
+                            <i class='bx bx-user-voice text-purple-600 text-xl'></i>
+                        </div>
+                        <h3 class="ml-3 text-lg leading-6 font-medium text-gray-900">
+                            Annotator Information
+                        </h3>
+                    </div>
                     <p class="mt-1 max-w-2xl text-sm text-gray-500">
                         Fill in the details for the new annotator account
                     </p>
                 </div>
-                <div class="px-4 py-5 sm:p-6">
+                <div class="px-6 py-5">
                     <form th:action="@{/admin/users/save}" method="post" th:object="${user}">
                         <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                             <div class="sm:col-span-3">
                                 <label for="username" class="block text-sm font-medium text-gray-700">Username*</label>
                                 <div class="mt-1">
                                     <input type="text" id="username" th:field="*{username}" required
-                                           class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                           class="shadow-sm focus:ring-purple-500 focus:border-purple-500 block w-full sm:text-sm border-gray-300 rounded-md">
                                 </div>
-                                <p class="mt-2 text-sm text-gray-500">Username will be used for login. Must be unique.</p>
+                                <p class="mt-2 text-xs text-gray-500">Username will be used for login. Must be unique.</p>
                             </div>
                             
                             <div class="sm:col-span-3">
@@ -160,7 +146,7 @@
                                 <label for="firstname" class="block text-sm font-medium text-gray-700">First Name*</label>
                                 <div class="mt-1">
                                     <input type="text" id="firstname" th:field="*{firstname}" required
-                                           class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                           class="shadow-sm focus:ring-purple-500 focus:border-purple-500 block w-full sm:text-sm border-gray-300 rounded-md">
                                 </div>
                             </div>
                             
@@ -168,19 +154,19 @@
                                 <label for="lastname" class="block text-sm font-medium text-gray-700">Last Name*</label>
                                 <div class="mt-1">
                                     <input type="text" id="lastname" th:field="*{lastname}" required
-                                           class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                           class="shadow-sm focus:ring-purple-500 focus:border-purple-500 block w-full sm:text-sm border-gray-300 rounded-md">
                                 </div>
                             </div>
                             
                             <div class="sm:col-span-6">
-                                <div class="rounded-md bg-blue-50 p-4">
+                                <div class="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-4 border border-purple-100">
                                     <div class="flex">
                                         <div class="flex-shrink-0">
-                                            <i class='bx bx-info-circle text-blue-400 text-xl'></i>
+                                            <i class='bx bx-info-circle text-purple-500 text-xl'></i>
                                         </div>
                                         <div class="ml-3">
-                                            <h3 class="text-sm font-medium text-blue-800">Password Generation</h3>
-                                            <div class="mt-2 text-sm text-blue-700">
+                                            <h3 class="text-sm font-medium text-purple-800">Password Generation</h3>
+                                            <div class="mt-2 text-sm text-purple-700">
                                                 <p>A random password will be generated automatically. The password will be displayed after creation.</p>
                                             </div>
                                         </div>
@@ -191,10 +177,10 @@
                         
                         <div class="mt-6 pt-5 border-t border-gray-200">
                             <div class="flex justify-end">
-                                <a th:href="@{/admin/users}" class="py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-3">
+                                <a th:href="@{/admin/users}" class="py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 mr-3 transition duration-150 ease-in-out">
                                     Cancel
                                 </a>
-                                <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                                <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-150 ease-in-out">
                                     <i class='bx bx-user-plus mr-1'></i>
                                     Create Annotator
                                 </button>
@@ -217,17 +203,5 @@
     
     <!-- Main JavaScript -->
     <script th:src="@{/js/main.js}"></script>
-    
-    <script>
-        // Mobile menu toggle
-        document.getElementById('mobile-menu-button').addEventListener('click', function() {
-            document.getElementById('mobile-menu').classList.toggle('hidden');
-        });
-        
-        // User dropdown toggle
-        document.getElementById('user-menu-button').addEventListener('click', function() {
-            document.getElementById('user-dropdown').classList.toggle('hidden');
-        });
-    </script>
 </body>
 </html> 

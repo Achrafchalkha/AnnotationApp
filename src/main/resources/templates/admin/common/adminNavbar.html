@@ -1,40 +1,121 @@
-<nav th:fragment="adminNavbar" class="bg-gradient-to-r from-purple-600 to-indigo-600 shadow-sm w-full z-20">
+<nav th:fragment="adminNavbar" class="bg-gradient-to-r from-purple-600 to-indigo-700 shadow-md sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-[70px]">
-            <!-- Logo and Navigation Links -->
-            <div class="flex items-center space-x-8">
-                <div class="flex items-center">
-                    <div class="h-10 w-10 rounded-full bg-white bg-opacity-20 flex items-center justify-center">
-                        <i class='bx bx-analyse text-white text-xl'></i>
-                    </div>
-                    <span class="ml-3 text-white font-semibold text-lg">Annotations</span>
-                </div>
-                <div class="hidden md:flex space-x-2 ml-8">
-                    <a th:href="@{/admin}" class="flex items-center px-4 py-2 rounded-md text-white font-medium hover:bg-white hover:bg-opacity-10 transition menu-item">
-                        <i class='bx bxs-dashboard text-xl mr-2'></i> Dashboard
-                    </a>
-                    <a th:href="@{/admin/users}" class="flex items-center px-4 py-2 rounded-md text-white font-medium hover:bg-white hover:bg-opacity-10 transition menu-item">
-                        <i class='bx bx-user text-xl mr-2'></i> Users
-                    </a>
-                    <a th:href="@{/admin/datasets}" class="flex items-center px-4 py-2 rounded-md text-white font-medium hover:bg-white hover:bg-opacity-10 transition menu-item">
-                        <i class='bx bx-data text-xl mr-2'></i> Datasets
-                    </a>
-                    <a th:href="@{/admin/datasets/statistics}" class="flex items-center px-4 py-2 rounded-md text-white font-medium hover:bg-white hover:bg-opacity-10 transition menu-item">
-                        <i class='bx bx-line-chart text-xl mr-2'></i> Statistics
-                    </a>
+        <div class="flex justify-between h-16">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 flex items-center">
+                    <i class='bx bx-analyse text-white text-2xl mr-2'></i>
+                    <span class="text-white font-bold text-xl">Annotation Platform</span>
                 </div>
             </div>
-            <!-- Search, User Info, Logout -->
-            <div class="flex items-center space-x-4">
-                <div class="relative hidden md:block">
-                    <input type="text" placeholder="Search..." class="w-64 pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                    <i class='bx bx-search absolute left-3 top-2.5 text-gray-400'></i>
-                </div>
-                <span class="text-sm font-medium text-white">Welcome, <span th:text="${currentUserName}">Admin</span></span>
-                <a th:href="@{/logout}" class="px-3 py-1 rounded-lg bg-white bg-opacity-20 text-white flex items-center text-sm font-medium hover:bg-opacity-40 transition">
-                    <i class='bx bx-log-out mr-1'></i> Logout
+            
+            <!-- Desktop Navigation -->
+            <div class="hidden md:flex md:items-center md:space-x-4">
+                <a th:href="@{/admin}" class="text-white hover:bg-purple-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
+                    <i class='bx bxs-dashboard mr-1'></i> Dashboard
                 </a>
+                <a th:href="@{/admin/datasets}" class="text-white hover:bg-purple-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
+                    <i class='bx bx-data mr-1'></i> Datasets
+                </a>
+                <a th:href="@{/admin/users}" class="text-white hover:bg-purple-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
+                    <i class='bx bx-user mr-1'></i> Users
+                </a>
+                <a th:href="@{/admin/tasks}" class="text-white hover:bg-purple-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
+                    <i class='bx bx-task mr-1'></i> Tasks
+                </a>
+                <a th:href="@{/admin/datasets/statistics}" class="text-white hover:bg-purple-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
+                    <i class='bx bx-line-chart mr-1'></i> Statistics
+                </a>
+                <div class="relative ml-3">
+                    <div>
+                        <button type="button" class="flex items-center text-white hover:bg-purple-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
+                            <i class='bx bx-user-circle mr-1'></i>
+                            <span th:text="${currentUserName}">Admin</span>
+                            <i class='bx bx-chevron-down ml-1'></i>
+                        </button>
+                    </div>
+                    <div class="hidden origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5" id="user-dropdown">
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your Profile</a>
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+                        <a th:href="@{/logout}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign out</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mobile menu button -->
+            <div class="flex items-center md:hidden">
+                <button type="button" class="text-white hover:bg-purple-700 hover:text-white inline-flex items-center justify-center p-2 rounded-md" id="mobile-menu-button">
+                    <i class='bx bx-menu text-2xl'></i>
+                </button>
             </div>
         </div>
     </div>
+    
+    <!-- Mobile menu -->
+    <div class="hidden md:hidden bg-purple-800" id="mobile-menu">
+        <div class="px-2 pt-2 pb-3 space-y-1">
+            <a th:href="@{/admin}" class="text-white hover:bg-purple-700 block px-3 py-2 rounded-md text-base font-medium">
+                <i class='bx bxs-dashboard mr-1'></i> Dashboard
+            </a>
+            <a th:href="@{/admin/datasets}" class="text-white hover:bg-purple-700 block px-3 py-2 rounded-md text-base font-medium">
+                <i class='bx bx-data mr-1'></i> Datasets
+            </a>
+            <a th:href="@{/admin/users}" class="text-white hover:bg-purple-700 block px-3 py-2 rounded-md text-base font-medium">
+                <i class='bx bx-user mr-1'></i> Users
+            </a>
+            <a th:href="@{/admin/tasks}" class="text-white hover:bg-purple-700 block px-3 py-2 rounded-md text-base font-medium">
+                <i class='bx bx-task mr-1'></i> Tasks
+            </a>
+            <a th:href="@{/admin/datasets/statistics}" class="text-white hover:bg-purple-700 block px-3 py-2 rounded-md text-base font-medium">
+                <i class='bx bx-line-chart mr-1'></i> Statistics
+            </a>
+            <a th:href="@{/logout}" class="text-white hover:bg-purple-700 block px-3 py-2 rounded-md text-base font-medium">
+                <i class='bx bx-log-out mr-1'></i> Sign out
+            </a>
+        </div>
+    </div>
+    
+    <!-- JavaScript for dropdown and mobile menu -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            if (mobileMenuButton && mobileMenu) {
+                mobileMenuButton.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+            
+            // User dropdown toggle
+            const userMenuButton = document.getElementById('user-menu-button');
+            const userDropdown = document.getElementById('user-dropdown');
+            
+            if (userMenuButton && userDropdown) {
+                userMenuButton.addEventListener('click', function(event) {
+                    userDropdown.classList.toggle('hidden');
+                    event.stopPropagation();
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(event) {
+                    if (!userMenuButton.contains(event.target) && !userDropdown.contains(event.target)) {
+                        userDropdown.classList.add('hidden');
+                    }
+                });
+            }
+            
+            // Add active class to current page
+            const currentPath = window.location.pathname;
+            const menuItems = document.querySelectorAll('.md\\:flex a, #mobile-menu a');
+            
+            menuItems.forEach(item => {
+                const href = item.getAttribute('href');
+                if (href === currentPath || 
+                    (href !== '/admin' && currentPath.startsWith(href))) {
+                    item.classList.add('bg-purple-700');
+                }
+            });
+        });
+    </script>
 </nav> 

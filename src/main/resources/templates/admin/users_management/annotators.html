@@ -11,82 +11,66 @@
     <!-- Boxicons -->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     
-    <!-- Google Fonts - Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts - Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f9fafb;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fe;
+        }
+        
+        .stats-card {
+            transition: all 0.3s ease;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .main-card {
+            transition: all 0.3s ease;
+        }
+        
+        .main-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-arrow {
+            transition: transform 0.3s ease;
+        }
+        
+        .main-card:hover .card-arrow {
+            transform: translateX(5px);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        .fade-in-delay-1 {
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+            animation-delay: 0.2s;
+        }
+        
+        .fade-in-delay-2 {
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+            animation-delay: 0.4s;
         }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
-    <!-- Navbar -->
-    <nav class="bg-gradient-to-r from-blue-600 to-indigo-700 shadow-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 flex items-center">
-                        <i class='bx bx-analyse text-white text-2xl mr-2'></i>
-                        <span class="text-white font-bold text-xl">Annotation Platform</span>
-                    </div>
-                </div>
-                
-                <!-- Desktop Navigation -->
-                <div class="hidden md:flex md:items-center md:space-x-4">
-                    <a th:href="@{/admin}" class="text-white hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
-                        <i class='bx bxs-dashboard mr-1'></i> Dashboard
-                    </a>
-                    <a th:href="@{/admin/datasets}" class="text-white hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
-                        <i class='bx bx-data mr-1'></i> Datasets
-                    </a>
-                    <a th:href="@{/admin/users}" class="bg-blue-700 text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
-                        <i class='bx bx-user mr-1'></i> Users
-                    </a>
-                    <div class="relative ml-3">
-                        <div>
-                            <button type="button" class="flex items-center text-white hover:bg-blue-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" id="user-menu-button" aria-expanded="false" aria-haspopup="true" data-dropdown-toggle="user-dropdown">
-                                <i class='bx bx-user-circle mr-1'></i>
-                                <span th:text="${currentUserName}">Admin</span>
-                                <i class='bx bx-chevron-down ml-1'></i>
-                            </button>
-                        </div>
-                        <div class="hidden origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5" id="user-dropdown">
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your Profile</a>
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
-                            <a th:href="@{/logout}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign out</a>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Mobile menu button -->
-                <div class="flex items-center md:hidden">
-                    <button type="button" class="text-white hover:bg-blue-700 hover:text-white inline-flex items-center justify-center p-2 rounded-md" id="mobile-menu-button">
-                        <i class='bx bx-menu text-2xl'></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Mobile menu -->
-        <div class="hidden md:hidden bg-blue-800" id="mobile-menu">
-            <div class="px-2 pt-2 pb-3 space-y-1">
-                <a th:href="@{/admin}" class="text-white hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">
-                    <i class='bx bxs-dashboard mr-1'></i> Dashboard
-                </a>
-                <a th:href="@{/admin/datasets}" class="text-white hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">
-                    <i class='bx bx-data mr-1'></i> Datasets
-                </a>
-                <a th:href="@{/admin/users}" class="bg-blue-700 text-white block px-3 py-2 rounded-md text-base font-medium">
-                    <i class='bx bx-user mr-1'></i> Users
-                </a>
-                <a th:href="@{/logout}" class="text-white hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium">
-                    <i class='bx bx-log-out mr-1'></i> Sign out
-                </a>
-            </div>
-        </div>
-    </nav>
+    <!-- Import Admin Navbar Fragment -->
+    <div th:replace="~{admin/common/adminNavbar :: adminNavbar}"></div>
     
     <!-- Main content -->
     <main class="flex-grow py-8">
@@ -102,16 +86,11 @@
                         Add, edit, and manage annotators in the system
                     </p>
                 </div>
-                <div class="mt-4 flex md:mt-0 md:ml-4">
-                    <a th:href="@{/admin/users/add}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
-                        <i class='bx bx-user-plus mr-1'></i>
-                        Add New Annotator
-                    </a>
-                </div>
+               
             </div>
             
             <!-- Success/Error Messages -->
-            <div th:if="${success}" class="rounded-md bg-green-50 p-4 mb-6">
+            <div th:if="${success}" class="rounded-xl bg-green-50 p-4 mb-6 shadow-sm border-l-4 border-green-500 fade-in-delay-1">
                 <div class="flex">
                     <div class="flex-shrink-0">
                         <i class='bx bx-check-circle text-green-400 text-xl'></i>
@@ -129,7 +108,7 @@
                 </div>
             </div>
             
-            <div th:if="${error}" class="rounded-md bg-red-50 p-4 mb-6">
+            <div th:if="${error}" class="rounded-xl bg-red-50 p-4 mb-6 shadow-sm border-l-4 border-red-500 fade-in-delay-1">
                 <div class="flex">
                     <div class="flex-shrink-0">
                         <i class='bx bx-error-circle text-red-400 text-xl'></i>
@@ -148,23 +127,23 @@
             </div>
             
             <!-- Generated Password Display -->
-            <div th:if="${generatedPassword}" class="rounded-md bg-blue-50 p-4 mb-6">
+            <div th:if="${generatedPassword}" class="rounded-xl bg-gradient-to-r from-indigo-50 to-purple-50 p-4 mb-6 shadow-sm border-l-4 border-purple-500 fade-in-delay-1">
                 <div class="flex">
                     <div class="flex-shrink-0">
-                        <i class='bx bx-info-circle text-blue-400 text-xl'></i>
+                        <i class='bx bx-info-circle text-purple-500 text-xl'></i>
                     </div>
                     <div class="ml-3">
-                        <p class="text-sm font-medium text-blue-800">
+                        <p class="text-sm font-medium text-purple-800">
                             <span class="font-bold">New Password Generated: </span>
-                            <span th:text="${generatedPassword}"></span>
+                            <span class="bg-white px-2 py-1 rounded text-purple-800 font-mono" th:text="${generatedPassword}"></span>
                         </p>
-                        <p class="mt-2 text-sm text-blue-700">
+                        <p class="mt-2 text-sm text-purple-700">
                             Please make sure to save this password as it will not be shown again.
                         </p>
                     </div>
                     <div class="ml-auto pl-3">
                         <div class="-mx-1.5 -my-1.5">
-                            <button class="inline-flex bg-blue-50 rounded-md p-1.5 text-blue-500 hover:bg-blue-100 focus:outline-none">
+                            <button class="inline-flex bg-purple-100 rounded-md p-1.5 text-purple-500 hover:bg-purple-200 focus:outline-none">
                                 <i class='bx bx-x'></i>
                             </button>
                         </div>
@@ -173,13 +152,15 @@
             </div>
 
             <!-- Annotators Table -->
-            <div class="bg-white shadow overflow-hidden rounded-lg mb-8">
-                <div th:if="${annotators.empty}" class="px-4 py-12 text-center">
-                    <i class='bx bx-user-x text-gray-400 text-5xl'></i>
-                    <h3 class="mt-2 text-sm font-medium text-gray-900">No annotators found</h3>
+            <div class="bg-white shadow-sm overflow-hidden rounded-2xl mb-8 border-t-4 border-purple-500 fade-in-delay-1">
+                <div th:if="${annotators.empty}" class="px-6 py-12 text-center">
+                    <div class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-purple-100 mb-4">
+                        <i class='bx bx-user-x text-purple-500 text-4xl'></i>
+                    </div>
+                    <h3 class="mt-2 text-lg font-medium text-gray-900">No annotators found</h3>
                     <p class="mt-1 text-sm text-gray-500">Get started by creating a new annotator.</p>
                     <div class="mt-6">
-                        <a th:href="@{/admin/users/add}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                        <a th:href="@{/admin/users/add}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-150 ease-in-out">
                             <i class='bx bx-user-plus mr-2'></i>
                             Add New Annotator
                         </a>
@@ -187,6 +168,21 @@
                 </div>
                 
                 <div th:unless="${annotators.empty}">
+                    <div class="sm:flex sm:items-center px-6 py-4 bg-gray-50 border-b border-gray-200">
+                        <div class="sm:flex-auto">
+                            <h1 class="text-lg font-semibold text-gray-900 flex items-center">
+                                <i class='bx bx-list-ul text-purple-600 mr-2'></i>
+                                Annotators List
+                            </h1>
+                            <p class="mt-1 text-sm text-gray-500">A list of all annotators in the system.</p>
+                        </div>
+                        <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+                            <a th:href="@{/admin/users/add}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-150 ease-in-out">
+                                <i class='bx bx-user-plus mr-1'></i>
+                                Add Annotator
+                            </a>
+                        </div>
+                    </div>
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
@@ -198,7 +194,7 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                <tr th:each="annotator : ${annotators}" class="hover:bg-gray-50">
+                                <tr th:each="annotator : ${annotators}" class="hover:bg-gray-50 transition duration-150 ease-in-out">
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${annotator.id}"></td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">
@@ -214,10 +210,10 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${annotator.username}"></td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <div class="flex justify-end space-x-2">
-                                            <a th:href="@{/admin/users/edit/{id}(id=${annotator.id})}" class="text-indigo-600 hover:text-indigo-900 p-1 rounded-full hover:bg-indigo-50" title="Edit">
+                                            <a th:href="@{/admin/users/edit/{id}(id=${annotator.id})}" class="text-purple-600 hover:text-purple-900 p-1.5 rounded-full hover:bg-purple-50 transition duration-150 ease-in-out" title="Edit">
                                                 <i class='bx bx-edit-alt'></i>
                                             </a>
-                                            <button type="button" class="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-50" 
+                                            <button type="button" class="text-red-600 hover:text-red-900 p-1.5 rounded-full hover:bg-red-50 transition duration-150 ease-in-out" 
                                                     th:data-modal-target="'deleteModal' + ${annotator.id}" 
                                                     th:onclick="'document.getElementById(\'deleteModal' + ${annotator.id} + '\').classList.remove(\'hidden\')'"
                                                     title="Delete">
@@ -226,43 +222,51 @@
                                         </div>
                                         
                                         <!-- Delete Confirmation Modal -->
-                                        <div th:id="'deleteModal' + ${annotator.id}" class="hidden fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-                                            <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                                        <div th:id="'deleteModal' + ${annotator.id}" class="hidden fixed z-50 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+                                            <div class="flex items-center justify-center min-h-screen p-4">
+                                                <!-- Background overlay -->
                                                 <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
                                                 
-                                                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-                                                
-                                                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                                                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                                                        <div class="sm:flex sm:items-start">
-                                                            <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                                                                <i class='bx bx-error-circle text-red-600 text-xl'></i>
-                                                            </div>
-                                                            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                                                                <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                                                                    Confirm Delete
-                                                                </h3>
-                                                                <div class="mt-2">
-                                                                    <p class="text-sm text-gray-500">
-                                                                        Are you sure you want to delete the annotator 
-                                                                        <span class="font-semibold" th:text="${annotator.firstname + ' ' + annotator.lastname}"></span>?
-                                                                        This action cannot be undone.
-                                                                    </p>
-                                                                </div>
-                                                            </div>
+                                                <!-- Modal content -->
+                                                <div class="relative bg-white rounded-lg shadow-xl overflow-hidden w-full max-w-lg mx-auto border border-gray-200">
+                                                    <div class="p-6 text-center">
+                                                        <!-- Icon -->
+                                                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-16 w-16 rounded-full bg-red-50 mb-4">
+                                                            <i class='bx bx-trash text-red-500 text-2xl'></i>
                                                         </div>
-                                                    </div>
-                                                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                                                        <form th:action="@{/admin/users/delete/{id}(id=${annotator.id})}" method="post">
-                                                            <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
-                                                                Delete
+                                                        
+                                                        <!-- Title -->
+                                                        <h3 class="text-xl font-bold text-gray-900 mb-4">
+                                                            Delete Annotator
+                                                        </h3>
+                                                        
+                                                        <!-- Confirmation text -->
+                                                        <div class="mb-4 px-4">
+                                                            <p class="text-gray-600 mb-2 break-words">
+                                                                Are you sure you want to delete the annotator 
+                                                                <span class="font-semibold text-purple-700" th:text="${annotator.firstname + ' ' + annotator.lastname}"></span>?
+                                                            </p>
+                                                            
+                                                            <!-- Warning -->
+                                                            <p class="text-red-600 font-semibold mt-2">
+                                                                This action cannot be undone.
+                                                            </p>
+                                                        </div>
+                                                        
+                                                        <!-- Buttons -->
+                                                        <div class="flex justify-center gap-3 mt-6">
+                                                            <button type="button" 
+                                                                    class="px-5 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-lg text-sm font-medium shadow-sm hover:bg-gray-50"
+                                                                    th:onclick="'document.getElementById(\'deleteModal' + ${annotator.id} + '\').classList.add(\'hidden\')'">
+                                                                Cancel
                                                             </button>
-                                                        </form>
-                                                        <button type="button" 
-                                                                th:onclick="'document.getElementById(\'deleteModal' + ${annotator.id} + '\').classList.add(\'hidden\')'"
-                                                                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">
-                                                            Cancel
-                                                        </button>
+                                                            
+                                                            <form th:action="@{/admin/users/delete/{id}(id=${annotator.id})}" method="post">
+                                                                <button type="submit" class="px-5 py-2.5 bg-red-600 text-white rounded-lg text-sm font-medium shadow-sm hover:bg-red-700">
+                                                                    <i class='bx bx-trash mr-1.5'></i> Delete
+                                                                </button>
+                                                            </form>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -288,17 +292,5 @@
     
     <!-- Main JavaScript -->
     <script th:src="@{/js/main.js}"></script>
-    
-    <script>
-        // Mobile menu toggle
-        document.getElementById('mobile-menu-button').addEventListener('click', function() {
-            document.getElementById('mobile-menu').classList.toggle('hidden');
-        });
-        
-        // User dropdown toggle
-        document.getElementById('user-menu-button').addEventListener('click', function() {
-            document.getElementById('user-dropdown').classList.toggle('hidden');
-        });
-    </script>
 </body>
 </html> 

@@ -3,126 +3,269 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Annotation Tasks</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <title>My Annotation Tasks - Annotation Platform</title>
+    
+    <!-- Tailwind CSS -->
+    <link rel="stylesheet" th:href="@{/css/tailwind.css}">
+    
+    <!-- Boxicons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    
+    <!-- Google Fonts - Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fe;
+        }
+        
+        .should-animate {
+            transition: all 0.3s ease;
+        }
+        
+        .should-animate:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+    </style>
 </head>
-<body class="bg-gray-100">
-    <div class="min-h-screen">
-        <!-- Navigation -->
-        <nav class="bg-blue-600">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex items-center justify-between h-16">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <h1 class="text-white font-bold">Annotation App</h1>
-                        </div>
-                        <div class="hidden md:block">
-                            <div class="ml-10 flex items-baseline space-x-4">
-                                <a th:href="@{/user/tasks}" class="bg-blue-700 text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
-                                    <i class="fas fa-tasks mr-2"></i> My Tasks
-                                </a>
-                            </div>
-                        </div>
+<body class="min-h-screen flex flex-col">
+    <!-- Navbar -->
+    <nav class="bg-gradient-to-r from-purple-600 to-indigo-700 shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class='bx bx-analyse text-white text-2xl mr-2'></i>
+                        <span class="text-white font-bold text-xl">Annotation Platform</span>
                     </div>
-                    <div class="hidden md:block">
-                        <div class="ml-4 flex items-center md:ml-6">
-                            <div class="ml-3 relative">
-                                <span class="text-white" th:text="${currentUser != null ? currentUser.getFirstname() + ' ' + currentUser.getLastname() : 'User'}"></span>
-                            </div>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex md:items-center md:space-x-4">
+                    <a th:href="@{/dashboard}" class="text-white hover:bg-purple-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
+                        <i class='bx bxs-dashboard mr-1'></i> Dashboard
+                    </a>
+                    <a th:href="@{/user/tasks}" class="bg-purple-700 text-white hover:bg-purple-800 hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
+                        <i class='bx bx-task mr-1'></i> My Tasks
+                    </a>
+                    <div class="relative ml-3">
+                        <div>
+                            <button type="button" class="flex items-center text-white hover:bg-purple-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
+                                <i class='bx bx-user-circle mr-1'></i>
+                                <span th:text="${currentUser != null ? currentUser.getFirstname() : 'User'}">User</span>
+                                <i class='bx bx-chevron-down ml-1'></i>
+                            </button>
+                        </div>
+                        <div class="hidden origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5" id="user-dropdown">
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your Profile</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+                            <a th:href="@{/logout}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign out</a>
                         </div>
                     </div>
                 </div>
+                
+                <!-- Mobile menu button -->
+                <div class="flex items-center md:hidden">
+                    <button type="button" class="text-white hover:bg-purple-700 hover:text-white inline-flex items-center justify-center p-2 rounded-md" id="mobile-menu-button">
+                        <i class='bx bx-menu text-2xl'></i>
+                    </button>
+                </div>
             </div>
-        </nav>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div class="hidden md:hidden bg-purple-800" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a th:href="@{/dashboard}" class="text-white hover:bg-purple-700 block px-3 py-2 rounded-md text-base font-medium">
+                    <i class='bx bxs-dashboard mr-1'></i> Dashboard
+                </a>
+                <a th:href="@{/user/tasks}" class="bg-purple-700 text-white block px-3 py-2 rounded-md text-base font-medium">
+                    <i class='bx bx-task mr-1'></i> My Tasks
+                </a>
+                <a th:href="@{/logout}" class="text-white hover:bg-purple-700 block px-3 py-2 rounded-md text-base font-medium">
+                    <i class='bx bx-log-out mr-1'></i> Sign out
+                </a>
+            </div>
+        </div>
+    </nav>
 
-        <!-- Main content -->
-        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <!-- Main content -->
+    <main class="flex-grow py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Alert Messages -->
             <div th:if="${errorMessage}" class="mb-4">
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                    <span class="block sm:inline" th:text="${errorMessage}"></span>
+                <div class="bg-red-50 border-l-4 border-red-400 p-4 flash-message transition-opacity duration-300">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class='bx bx-error-circle text-red-400 text-xl'></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-red-700" th:text="${errorMessage}">Error message</p>
+                        </div>
+                        <div class="ml-auto pl-3">
+                            <div class="-mx-1.5 -my-1.5">
+                                <button class="inline-flex rounded-md p-1.5 text-red-500 hover:bg-red-100 focus:outline-none">
+                                    <i class='bx bx-x'></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+            
             <div th:if="${success}" class="mb-4">
-                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-                    <span class="block sm:inline" th:text="${success}"></span>
+                <div class="bg-green-50 border-l-4 border-green-400 p-4 flash-message transition-opacity duration-300">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class='bx bx-check-circle text-green-400 text-xl'></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-green-700" th:text="${success}">Success message</p>
+                        </div>
+                        <div class="ml-auto pl-3">
+                            <div class="-mx-1.5 -my-1.5">
+                                <button class="inline-flex rounded-md p-1.5 text-green-500 hover:bg-green-100 focus:outline-none">
+                                    <i class='bx bx-x'></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <!-- Page header -->
-            <div class="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6 mb-5">
-                <div class="md:flex md:items-center md:justify-between">
-                    <div class="flex-1 min-w-0">
-                        <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
-                            My Annotation Tasks
-                        </h2>
-                        <p class="mt-1 text-sm text-gray-500">
-                            Below are all the annotation tasks assigned to you. Click "Work" to start annotating text pairs.
-                        </p>
+            <div class="bg-white shadow overflow-hidden rounded-lg mb-6 should-animate">
+                <div class="px-4 py-5 sm:p-6">
+                    <div class="md:flex md:items-center md:justify-between">
+                        <div class="flex-1 min-w-0">
+                            <h2 class="text-2xl font-bold text-gray-900 flex items-center">
+                                <i class='bx bx-task text-purple-600 mr-2 text-3xl'></i>
+                                My Annotation Tasks
+                            </h2>
+                            <p class="mt-1 text-sm text-gray-600">
+                                Below are all the annotation tasks assigned to you. Click "Work" to start annotating text pairs.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- Tasks list -->
-            <div class="mt-4">
-                <div class="bg-white shadow overflow-hidden sm:rounded-md">
-                    <ul class="divide-y divide-gray-200" th:if="${!tasks.empty}">
-                        <li th:each="task : ${tasks}">
-                            <div class="px-4 py-4 flex items-center sm:px-6">
-                                <div class="min-w-0 flex-1 sm:flex sm:items-center sm:justify-between">
-                                    <div>
-                                        <div class="flex text-sm">
-                                            <p class="font-medium text-blue-600 truncate" th:text="${'Task #' + task.id}"></p>
-                                            <p class="ml-1 flex-shrink-0 font-normal text-gray-500">
-                                                from <span class="text-gray-900 font-medium" th:text="${task.dataset != null ? task.dataset.name : 'Unknown dataset'}"></span>
+            <div class="bg-white shadow overflow-hidden rounded-lg should-animate">
+                <ul class="divide-y divide-gray-200" th:if="${!tasks.empty}">
+                    <li th:each="task : ${tasks}" class="hover:bg-gray-50">
+                        <div class="px-4 py-4 sm:px-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
+                                            <i class='bx bx-file-find text-purple-600 text-xl'></i>
+                                        </div>
+                                        <div class="ml-4">
+                                            <p class="font-medium text-purple-600" th:text="${'Task #' + task.id}">Task #1</p>
+                                            <p class="text-sm text-gray-500">
+                                                from <span class="text-gray-700 font-medium" th:text="${task.dataset != null ? task.dataset.name : 'Unknown dataset'}">Dataset</span>
                                             </p>
                                         </div>
-                                        <div class="mt-2 flex">
-                                            <div class="flex items-center text-sm text-gray-500">
-                                                <i class="fas fa-calendar flex-shrink-0 mr-1.5 text-gray-400"></i>
-                                                <p>
-                                                    Deadline: <span th:text="${#dates.format(task.dateLimite, 'yyyy-MM-dd')}"></span>
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div class="mt-2 flex">
-                                            <div class="flex items-center text-sm text-gray-500">
-                                                <i class="fas fa-file-alt flex-shrink-0 mr-1.5 text-gray-400"></i>
-                                                <p>
-                                                    <span th:text="${task.couples != null ? task.couples.size() : 0}"></span> text pairs to annotate
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <!-- Progress bar -->
-                                        <div class="mt-2 w-full bg-gray-200 rounded-full h-2.5">
-                                            <div class="bg-blue-600 h-2.5 rounded-full" th:style="'width: ' + ${(taskProgress.containsKey(task.id) ? taskProgress.get(task.id) : 0) + '%'}"></div>
-                                        </div>
-                                        <div class="mt-1 flex justify-between">
-                                            <span class="text-xs text-gray-500">Progress</span>
-                                            <span class="text-xs text-gray-500" th:text="${(taskProgress.containsKey(task.id) ? taskProgress.get(task.id) : 0) + '%'}">0%</span>
+                                    </div>
+                                    <div class="mt-2 sm:flex sm:justify-between">
+                                        <div class="sm:flex">
+                                            <p class="flex items-center text-sm text-gray-500">
+                                                <i class='bx bx-calendar mr-1.5 text-gray-400'></i>
+                                                Deadline: <span th:text="${#dates.format(task.dateLimite, 'yyyy-MM-dd')}">2023-12-31</span>
+                                            </p>
+                                            <p class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
+                                                <i class='bx bx-file-blank mr-1.5 text-gray-400'></i>
+                                                <span th:text="${task.couples != null ? task.couples.size() : 0}">10</span> text pairs to annotate
+                                            </p>
                                         </div>
                                     </div>
-                                    <div class="mt-4 flex-shrink-0 sm:mt-0 sm:ml-5">
-                                        <a th:href="@{'/user/tasks/' + ${task.id} + '/direct-access'}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                            <i class="fas fa-play mr-2"></i> Work
-                                        </a>
+                                    <!-- Progress bar -->
+                                    <div class="mt-2 w-full bg-gray-200 rounded-full h-2.5">
+                                        <div class="bg-purple-600 h-2.5 rounded-full" th:style="'width: ' + ${(taskProgress.containsKey(task.id) ? taskProgress.get(task.id) : 0) + '%'}"></div>
+                                    </div>
+                                    <div class="mt-1 flex justify-between">
+                                        <span class="text-xs text-gray-500">Progress</span>
+                                        <span class="text-xs text-gray-500" th:text="${(taskProgress.containsKey(task.id) ? taskProgress.get(task.id) : 0) + '%'}">0%</span>
                                     </div>
                                 </div>
+                                <div class="ml-5 flex-shrink-0">
+                                    <a th:href="@{'/user/tasks/' + ${task.id} + '/direct-access'}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                                        <i class='bx bx-play mr-2'></i> Work
+                                    </a>
+                                </div>
                             </div>
-                        </li>
-                    </ul>
-                    <!-- Empty state -->
-                    <div th:if="${tasks.empty}" class="text-center py-12">
-                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                        </svg>
-                        <h3 class="mt-2 text-sm font-medium text-gray-900">No tasks</h3>
-                        <p class="mt-1 text-sm text-gray-500">You don't have any annotation tasks assigned to you yet.</p>
+                        </div>
+                    </li>
+                </ul>
+                <!-- Empty state -->
+                <div th:if="${tasks.empty}" class="text-center py-12">
+                    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-purple-100">
+                        <i class='bx bx-calendar-x text-purple-600 text-xl'></i>
                     </div>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">No tasks</h3>
+                    <p class="mt-1 text-sm text-gray-500">You don't have any annotation tasks assigned to you yet.</p>
                 </div>
             </div>
         </div>
-    </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-white shadow-inner mt-auto">
+        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-sm text-gray-500">
+                &copy; 2023 Annotation Platform. All rights reserved.
+            </p>
+        </div>
+    </footer>
+    
+    <!-- Main JavaScript -->
+    <script th:src="@{/js/main.js}"></script>
+    
+    <!-- JavaScript for dropdown and mobile menu -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            if (mobileMenuButton && mobileMenu) {
+                mobileMenuButton.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+            
+            // User dropdown toggle
+            const userMenuButton = document.getElementById('user-menu-button');
+            const userDropdown = document.getElementById('user-dropdown');
+            
+            if (userMenuButton && userDropdown) {
+                userMenuButton.addEventListener('click', function(event) {
+                    userDropdown.classList.toggle('hidden');
+                    event.stopPropagation();
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(event) {
+                    if (!userMenuButton.contains(event.target) && !userDropdown.contains(event.target)) {
+                        userDropdown.classList.add('hidden');
+                    }
+                });
+            }
+            
+            // Auto-hide flash messages
+            const flashMessages = document.querySelectorAll('.flash-message');
+            flashMessages.forEach(function(message) {
+                setTimeout(function() {
+                    message.style.opacity = '0';
+                    setTimeout(function() {
+                        message.style.display = 'none';
+                    }, 300);
+                }, 5000);
+            });
+        });
+    </script>
 </body>
 </html> 
