@@ -24,4 +24,17 @@ public interface CoupleTextRepository extends JpaRepository<CoupleText, Long> {
     @Transactional
     @Query("DELETE FROM CoupleText c WHERE c.dataset.id = :datasetId")
     void deleteByDatasetId(@Param("datasetId") Long datasetId);
+
+    /**
+     * Find all annotated text pairs for a specific task without duplicates
+     */
+    @Query(value = "SELECT DISTINCT c.* FROM task_couple tc " +
+           "JOIN couple_text c ON tc.couple_id = c.id " +
+           "WHERE tc.task_id = :taskId " +
+           "AND c.class_annotation IS NOT NULL " +
+           "AND c.class_annotation != '' " +
+           "LIMIT :limit OFFSET :offset", nativeQuery = true)
+    List<CoupleText> findAnnotatedPairsByTaskId(@Param("taskId") Long taskId, 
+                                               @Param("limit") int limit, 
+                                               @Param("offset") int offset);
 }

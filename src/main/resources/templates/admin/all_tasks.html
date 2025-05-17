@@ -188,8 +188,8 @@
                                             </div>
                                             <div>
                                                 <div class="font-medium text-gray-900">Task #<span th:text="${task.id}">1</span></div>
-                                                <div th:if="${task.couples != null}" class="text-xs text-gray-500">
-                                                    <span th:text="${task.couples.size()}">0</span> Pairs
+                                                <div class="text-xs text-gray-500">
+                                                    <span th:text="${taskPairCounts != null && taskPairCounts.containsKey(task.id) ? taskPairCounts.get(task.id) : 0}">0</span> Assigned Pairs
                                                 </div>
                                             </div>
                                         </div>
@@ -212,9 +212,6 @@
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                                        <a th:href="@{'/admin/tasks/' + ${task.id}}" class="text-indigo-600 hover:text-indigo-900 mr-3">
-                                            <i class="bx bx-info-circle"></i> Details
-                                        </a>
                                         <a th:href="@{'/admin/tasks/' + ${task.id} + '/review'}" class="text-purple-600 hover:text-purple-900">
                                             <i class="bx bx-check-shield"></i> Review
                                         </a>

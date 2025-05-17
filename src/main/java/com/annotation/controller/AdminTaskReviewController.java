@@ -51,37 +51,39 @@ public class AdminTaskReviewController {
             String username = returnUsername();
             model.addAttribute("currentUserName", username);
             
-            // Get task with all relationships loaded
-            Task task = taskRepository.findByIdWithCouples(taskId);
+            // Get task with relationships loaded but without couples to avoid Cartesian products
+            Task task = taskRepository.findByIdWithoutCouples(taskId);
             
             if (task == null) {
                 model.addAttribute("errorMessage", "Task not found with ID: " + taskId);
                 return "admin/task_review";
             }
             
-            // Filter only annotated couples (text pairs)
-            List<CoupleText> annotatedPairs = task.getCouples().stream()
-                .filter(couple -> couple != null && couple.getClassAnnotation() != null && !couple.getClassAnnotation().isEmpty())
-                .collect(Collectors.toList());
+            // Get the accurate count of pairs assigned to this task
+            int assignedPairsCount = taskRepository.countCouplesByTaskId(taskId);
+            
+            // Get the accurate count of annotated pairs
+            int annotatedCount = taskRepository.countAnnotatedCouplesByTaskId(taskId);
             
             // Calculate pagination values
-            int totalPairs = annotatedPairs.size();
-            int totalPages = (int) Math.ceil((double) totalPairs / size);
+            int totalPages = (int) Math.ceil((double) annotatedCount / size);
+            int currentPage = page;
             
-            // Apply pagination (simple in-memory pagination)
-            List<CoupleText> paginatedPairs;
-            if (!annotatedPairs.isEmpty()) {
-                int fromIndex = Math.min(page * size, totalPairs);
-                int toIndex = Math.min((page + 1) * size, totalPairs);
-                paginatedPairs = annotatedPairs.subList(fromIndex, toIndex);
-            } else {
-                paginatedPairs = annotatedPairs;
+            // Make sure the page number is valid
+            if (currentPage < 0) {
+                currentPage = 0;
+            } else if (currentPage >= totalPages && totalPages > 0) {
+                currentPage = totalPages - 1;
             }
             
-            // Calculate progress percentage
-            int totalCouples = task.getCouples().size();
-            int annotatedCount = annotatedPairs.size();
-            int progress = totalCouples > 0 ? (annotatedCount * 100) / totalCouples : 0;
+            // Calculate offset for pagination
+            int offset = currentPage * size;
+            
+            // Fetch paginated annotated text pairs directly from the repository
+            List<CoupleText> paginatedPairs = coupleTextRepository.findAnnotatedPairsByTaskId(taskId, size, offset);
+            
+            // Calculate progress percentage using the accurate counts
+            int progress = assignedPairsCount > 0 ? (annotatedCount * 100) / assignedPairsCount : 0;
             
             // Get all available classes for the dataset
             List<ClassPossible> allClasses = new ArrayList<>();
@@ -90,16 +92,18 @@ public class AdminTaskReviewController {
             }
             
             // Log information for debugging
-            logger.info("Task ID: " + taskId + " has " + totalCouples + 
+            logger.info("Task ID: " + taskId + " has " + assignedPairsCount + 
                       " total couples and " + annotatedCount + " annotated couples");
             
             // Add data to the model
             model.addAttribute("task", task);
             model.addAttribute("annotatedPairs", paginatedPairs);
             model.addAttribute("allClasses", allClasses);
-            model.addAttribute("currentPage", page);
+            model.addAttribute("currentPage", currentPage);
             model.addAttribute("totalPages", totalPages);
             model.addAttribute("progress", progress);
+            model.addAttribute("assignedPairsCount", assignedPairsCount);
+            model.addAttribute("annotatedCount", annotatedCount);
             
             return "admin/task_review";
         } catch (Exception e) {
@@ -123,7 +127,7 @@ public class AdminTaskReviewController {
     public String updateAnnotation(
             @PathVariable Long taskId,
             @RequestParam("pairId") Long pairId,
-            @RequestParam(value = "classIds", required = false) List<Long> classIds,
+            @RequestParam(value = "classId", required = false) Long classId,
             RedirectAttributes redirectAttributes) {
         
         try {
@@ -140,24 +144,17 @@ public class AdminTaskReviewController {
                     return "redirect:/admin/tasks/" + taskId + "/review";
                 }
                 
-                // Build new classification string from selected classes
-                StringBuilder newClassification = new StringBuilder();
+                // Build new classification string from selected class
+                String newClassification = "";
                 
-                if (classIds != null && !classIds.isEmpty()) {
-                    // Get the class names from class IDs
-                    List<String> classNames = new ArrayList<>();
-                    
-                    for (Long classId : classIds) {
-                        for (ClassPossible classPossible : task.getDataset().getClassesPossibles()) {
-                            if (classPossible.getId().equals(classId)) {
-                                classNames.add(classPossible.getTextClass());
-                                break;
-                            }
+                if (classId != null) {
+                    // Find the selected class by ID
+                    for (ClassPossible classPossible : task.getDataset().getClassesPossibles()) {
+                        if (classPossible.getId().equals(classId)) {
+                            newClassification = classPossible.getTextClass();
+                            break;
                         }
                     }
-                    
-                    // Join class names with commas
-                    newClassification.append(String.join(", ", classNames));
                 }
                 
                 // Log before update
@@ -165,7 +162,7 @@ public class AdminTaskReviewController {
                            " from '" + couple.getClassAnnotation() + "' to '" + newClassification + "'");
                 
                 // Update the classification
-                couple.setClassAnnotation(newClassification.toString());
+                couple.setClassAnnotation(newClassification);
                 
                 // Save the updated couple
                 coupleTextRepository.save(couple);

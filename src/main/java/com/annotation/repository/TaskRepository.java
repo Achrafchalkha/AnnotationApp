@@ -27,6 +27,29 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
            "WHERE t.id = :taskId")
     Task findByIdWithCouples(@Param("taskId") Long taskId);
     
+    /**
+     * Retrieves a task with accurate pair count, avoiding Cartesian products
+     */
+    @Query(value = "SELECT t.* FROM tasks t " +
+           "JOIN users u ON t.user_id = u.id " +
+           "JOIN dataset d ON t.dataset_id = d.id " +
+           "WHERE t.id = :taskId", nativeQuery = true)
+    Task findByIdWithoutCouples(@Param("taskId") Long taskId);
+    
+    /**
+     * Counts the exact number of text pairs associated with a task
+     */
+    @Query(value = "SELECT COUNT(*) FROM task_couple WHERE task_id = :taskId", nativeQuery = true)
+    int countCouplesByTaskId(@Param("taskId") Long taskId);
+    
+    /**
+     * Gets all text pairs for a specific task
+     */
+    @Query(value = "SELECT c.* FROM task_couple tc " +
+           "JOIN couple_text c ON tc.couple_id = c.id " +
+           "WHERE tc.task_id = :taskId", nativeQuery = true)
+    List<Object[]> findCouplesByTaskId(@Param("taskId") Long taskId);
+    
     @Query("SELECT DISTINCT t FROM Task t " +
            "LEFT JOIN FETCH t.user " +
            "LEFT JOIN FETCH t.dataset " +
@@ -61,4 +84,14 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
            "LEFT JOIN FETCH t.couples " +
            "LEFT JOIN FETCH t.dataset.classesPossibles")
     List<Task> findAllWithoutOrder();
+
+    /**
+     * Counts the exact number of annotated text pairs associated with a task
+     */
+    @Query(value = "SELECT COUNT(*) FROM task_couple tc " +
+           "JOIN couple_text c ON tc.couple_id = c.id " +
+           "WHERE tc.task_id = :taskId " +
+           "AND c.class_annotation IS NOT NULL " +
+           "AND c.class_annotation != ''", nativeQuery = true)
+    int countAnnotatedCouplesByTaskId(@Param("taskId") Long taskId);
 }
