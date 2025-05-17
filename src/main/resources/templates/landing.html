@@ -1,0 +1,1803 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Annotation Platform</title>
+    
+    <!-- Tailwind CSS -->
+    <link rel="stylesheet" th:href="@{/css/tailwind.css}">
+    
+    <!-- Boxicons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    
+    <!-- Google Fonts - Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #7c3aed;
+            --primary-dark: #6d28d9;
+            --primary-light: #a78bfa;
+            --secondary: #4f46e5;
+            --secondary-dark: #4338ca;
+            --secondary-light: #818cf8;
+            --accent: #f472b6;
+            --accent-dark: #db2777;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+        
+        /* Gradient Backgrounds */
+        .gradient-bg {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            position: relative;
+        }
+        
+        .gradient-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+            z-index: 0;
+        }
+        
+        /* Cards and Elements */
+        .feature-card {
+            transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(124, 58, 237, 0.1);
+            position: relative;
+            z-index: 1;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(79, 70, 229, 0.1));
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-15px) scale(1.03);
+            box-shadow: 0 25px 50px rgba(124, 58, 237, 0.2);
+        }
+        
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+        
+        .feature-card .icon-wrapper {
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .feature-card:hover .icon-wrapper {
+            transform: scale(1.2) rotate(10deg);
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 10px 20px rgba(124, 58, 237, 0.3);
+        }
+        
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            box-shadow: 0 10px 20px rgba(124, 58, 237, 0.2);
+        }
+        
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.2);
+            transition: width 0.4s ease;
+            z-index: -1;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(124, 58, 237, 0.3);
+        }
+        
+        .btn-primary:hover::after {
+            width: 100%;
+        }
+        
+        .btn-secondary {
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            box-shadow: 0 10px 20px rgba(124, 58, 237, 0.1);
+        }
+        
+        .btn-secondary::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background-color: var(--primary);
+            transition: width 0.4s ease;
+            z-index: -1;
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-5px) scale(1.05);
+            color: white;
+            box-shadow: 0 15px 30px rgba(124, 58, 237, 0.2);
+        }
+        
+        .btn-secondary:hover::after {
+            width: 100%;
+        }
+        
+        /* Learn More Button */
+        .learn-more-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1.25rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 50px;
+            font-weight: 500;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 5px 15px rgba(124, 58, 237, 0.3);
+            z-index: 1;
+        }
+        
+        .learn-more-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        
+        .learn-more-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 20px rgba(124, 58, 237, 0.4);
+        }
+        
+        .learn-more-btn:hover::before {
+            opacity: 1;
+        }
+        
+        .learn-more-btn .icon {
+            transition: transform 0.3s ease;
+            margin-left: 0.5rem;
+        }
+        
+        .learn-more-btn:hover .icon {
+            transform: translateX(4px);
+        }
+        
+        /* Navigation */
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: white;
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        /* Step Cards */
+        .step-card {
+            transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(124, 58, 237, 0.1);
+        }
+        
+        .step-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 20px 40px rgba(124, 58, 237, 0.2);
+        }
+        
+        .step-card:hover .step-number {
+            transform: scale(1.2);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 10px 20px rgba(124, 58, 237, 0.3);
+        }
+        
+        .step-number {
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        .step-number::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 70%);
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.5s ease;
+            z-index: -1;
+        }
+        
+        .step-card:hover .step-number::after {
+            opacity: 0.3;
+            transform: scale(2);
+        }
+        
+        /* Social Icons */
+        .social-icon {
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .social-icon::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(124, 58, 237, 0.8) 0%, rgba(124, 58, 237, 0) 70%);
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.5s ease;
+        }
+        
+        .social-icon:hover {
+            transform: translateY(-8px) rotate(360deg);
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .social-icon:hover::after {
+            opacity: 0.3;
+            transform: scale(2);
+        }
+        
+        /* Testimonial Card */
+        .testimonial-card {
+            position: relative;
+            z-index: 1;
+            transition: all 0.6s ease;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .testimonial-card::before {
+            content: '"';
+            position: absolute;
+            top: -20px;
+            left: 20px;
+            font-size: 120px;
+            color: rgba(124, 58, 237, 0.1);
+            z-index: -1;
+            font-family: serif;
+            transition: all 0.5s ease;
+        }
+        
+        .testimonial-card:hover {
+            transform: scale(1.05) translateY(-10px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+        }
+        
+        .testimonial-card:hover::before {
+            transform: translateY(-10px) scale(1.1);
+            color: rgba(124, 58, 237, 0.15);
+        }
+        
+        /* Stats Counter */
+        .stats-counter {
+            counter-reset: stat;
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(124, 58, 237, 0.1);
+        }
+        
+        .stats-counter::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(124, 58, 237, 0.2) 0%, rgba(124, 58, 237, 0) 70%);
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.5s ease;
+        }
+        
+        .stats-counter:hover {
+            transform: translateY(-15px) scale(1.08);
+            box-shadow: 0 20px 40px rgba(124, 58, 237, 0.2);
+        }
+        
+        .stats-counter:hover::after {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        /* Wave Divider */
+        .wave-divider {
+            filter: drop-shadow(0 -5px 5px rgba(0,0,0,0.05));
+        }
+        
+        /* Floating Elements */
+        .floating {
+            animation: floating 6s ease-in-out infinite;
+        }
+        
+        .floating-slow {
+            animation: floating 8s ease-in-out infinite;
+        }
+        
+        .floating-fast {
+            animation: floating 4s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+        
+        /* Pulse Animation */
+        .pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.8;
+                transform: scale(1.05);
+            }
+        }
+        
+        /* Glow Effect */
+        .glow {
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 10px -10px rgba(124, 58, 237, 0.5);
+            }
+            to {
+                box-shadow: 0 0 20px 10px rgba(124, 58, 237, 0.5);
+            }
+        }
+        
+        /* Rotate Animation */
+        .rotate-slow {
+            animation: rotate 20s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        /* Fade In Up Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fadeInUp {
+            animation: fadeInUp 0.8s ease forwards;
+        }
+        
+        /* Fade In Left Animation */
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .animate-fadeInLeft {
+            animation: fadeInLeft 0.8s ease forwards;
+        }
+        
+        /* Fade In Right Animation */
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .animate-fadeInRight {
+            animation: fadeInRight 0.8s ease forwards;
+        }
+        
+        /* Zoom In Animation */
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .animate-zoomIn {
+            animation: zoomIn 0.8s ease forwards;
+        }
+        
+        /* Bounce Animation */
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-20px);
+            }
+            60% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        .animate-bounce {
+            animation: bounce 2s ease infinite;
+        }
+        
+        /* Shake Animation */
+        @keyframes shake {
+            0%, 100% {
+                transform: translateX(0);
+            }
+            10%, 30%, 50%, 70%, 90% {
+                transform: translateX(-5px);
+            }
+            20%, 40%, 60%, 80% {
+                transform: translateX(5px);
+            }
+        }
+        
+        .animate-shake {
+            animation: shake 0.8s ease;
+        }
+        
+        /* Flip Animation */
+        @keyframes flip {
+            0% {
+                transform: perspective(400px) rotateY(0);
+            }
+            100% {
+                transform: perspective(400px) rotateY(360deg);
+            }
+        }
+        
+        .animate-flip {
+            animation: flip 1.5s ease;
+        }
+        
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        .delay-400 { animation-delay: 0.4s; }
+        .delay-500 { animation-delay: 0.5s; }
+        .delay-600 { animation-delay: 0.6s; }
+        .delay-700 { animation-delay: 0.7s; }
+        .delay-800 { animation-delay: 0.8s; }
+        
+        /* Mobile Menu */
+        .mobile-menu {
+            transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+            transform: translateY(-100%);
+            opacity: 0;
+            visibility: hidden;
+            backdrop-filter: blur(10px);
+        }
+        
+        .mobile-menu.active {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Form Elements */
+        .form-input {
+            transition: all 0.4s ease;
+            border: 2px solid transparent;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+        }
+        
+        .form-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+            background: white;
+        }
+        
+        /* Scroll Progress Indicator */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            background-size: 200% 100%;
+            animation: gradientMove 3s ease infinite;
+            z-index: 1000;
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+        
+        @keyframes gradientMove {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        
+        /* Particle Animation */
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            pointer-events: none;
+        }
+        
+        /* Shine Effect */
+        .shine {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .shine::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.3) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: rotate(30deg);
+            animation: shine 6s infinite;
+        }
+        
+        @keyframes shine {
+            0% {
+                transform: translateX(-100%) rotate(30deg);
+            }
+            20%, 100% {
+                transform: translateX(100%) rotate(30deg);
+            }
+        }
+        
+        /* Sticky Header */
+        .sticky-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            background: rgba(124, 58, 237, 0.85);
+            backdrop-filter: blur(10px);
+            transform: translateY(-100%);
+            transition: transform 0.4s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sticky-header.visible {
+            transform: translateY(0);
+        }
+        
+        /* Animated Background */
+        .animated-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+        
+        .animated-bg-shape {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            animation: float 15s infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0);
+            }
+            25% {
+                transform: translate(10%, 15%);
+            }
+            50% {
+                transform: translate(5%, 5%);
+            }
+            75% {
+                transform: translate(15%, -5%);
+            }
+        }
+        
+        /* Typing Animation */
+        .typing::after {
+            content: '|';
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0;
+            }
+        }
+        
+        /* 3D Hover Effect */
+        .card-3d {
+            transition: transform 0.6s ease;
+            transform-style: preserve-3d;
+        }
+        
+        .card-3d:hover {
+            transform: rotateY(10deg) rotateX(10deg);
+        }
+        
+        /* Scroll Reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+        
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Blob Animation */
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.3;
+            animation: blobAnimation 15s infinite alternate;
+        }
+        
+        @keyframes blobAnimation {
+            0% {
+                transform: translate(0, 0) scale(1);
+                border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+            }
+            25% {
+                border-radius: 70% 30% 50% 50% / 30% 30% 70% 70%;
+            }
+            50% {
+                transform: translate(20px, 20px) scale(1.1);
+                border-radius: 50% 50% 20% 80% / 25% 80% 20% 75%;
+            }
+            75% {
+                border-radius: 60% 40% 80% 20% / 70% 30% 70% 30%;
+            }
+            100% {
+                transform: translate(-20px, -20px) scale(0.9);
+                border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            }
+        }
+        
+        /* Neon Glow */
+        .neon-glow {
+            box-shadow: 0 0 10px rgba(124, 58, 237, 0.5),
+                        0 0 20px rgba(124, 58, 237, 0.3),
+                        0 0 30px rgba(124, 58, 237, 0.1);
+            animation: neonPulse 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes neonPulse {
+            from {
+                box-shadow: 0 0 10px rgba(124, 58, 237, 0.5),
+                            0 0 20px rgba(124, 58, 237, 0.3),
+                            0 0 30px rgba(124, 58, 237, 0.1);
+            }
+            to {
+                box-shadow: 0 0 15px rgba(124, 58, 237, 0.6),
+                            0 0 30px rgba(124, 58, 237, 0.4),
+                            0 0 45px rgba(124, 58, 237, 0.2);
+            }
+        }
+        
+        /* Glassmorphism */
+        .glass {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Gradient Text */
+        .gradient-text {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradientMove 3s ease infinite;
+            background-size: 200% 100%;
+        }
+        
+        /* Ripple Effect */
+        .ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ripple::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: width 0.6s, height 0.6s, opacity 0.6s;
+        }
+        
+        .ripple:active::after {
+            width: 300px;
+            height: 300px;
+            opacity: 1;
+            transition: 0s;
+        }
+        
+        /* Magnetic Button */
+        .magnetic-btn {
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+    <!-- Scroll Progress Indicator -->
+    <div class="scroll-progress"></div>
+    
+    <!-- Sticky Header -->
+    <header id="sticky-header" class="sticky-header py-4 px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center max-w-7xl mx-auto">
+            <div class="flex items-center">
+                <i class='bx bx-data text-white text-3xl mr-2 pulse'></i>
+                <span class="text-white text-xl font-bold">Text Annotation Platform</span>
+            </div>
+            <div class="hidden md:flex space-x-8">
+                <a href="/login" class="text-white hover:text-indigo-200 transition nav-link">Login</a>
+                <a href="#features" class="text-white hover:text-indigo-200 transition nav-link">Features</a>
+                <a href="#how-it-works" class="text-white hover:text-indigo-200 transition nav-link">How it Works</a>
+                <a href="#contact" class="text-white hover:text-indigo-200 transition nav-link">Contact</a>
+            </div>
+            <button id="sticky-menu-toggle" class="md:hidden text-white text-2xl">
+                <i class='bx bx-menu'></i>
+            </button>
+        </div>
+    </header>
+    
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="mobile-menu fixed inset-0 bg-purple-900 bg-opacity-95 z-50 flex flex-col justify-center items-center">
+        <button id="close-menu" class="absolute top-6 right-6 text-white text-3xl">
+            <i class='bx bx-x'></i>
+        </button>
+        <div class="flex flex-col space-y-8 text-center">
+            <a href="#" class="text-white text-2xl font-medium hover:text-purple-300 transition">Home</a>
+            <a href="#features" class="text-white text-2xl font-medium hover:text-purple-300 transition">Features</a>
+            <a href="#how-it-works" class="text-white text-2xl font-medium hover:text-purple-300 transition">How it Works</a>
+            <a href="#contact" class="text-white text-2xl font-medium hover:text-purple-300 transition">Contact</a>
+            <a href="/login" class="mt-4 px-8 py-3 bg-white text-purple-700 rounded-lg font-medium shadow-lg hover:bg-purple-50 transition inline-block">
+                Login
+            </a>
+        </div>
+    </div>
+    
+    <!-- Hero Section -->
+    <div class="gradient-bg relative">
+        <!-- Animated Background -->
+        <div class="animated-bg">
+            <div class="animated-bg-shape" style="width: 300px; height: 300px; top: 10%; left: 5%; animation-duration: 20s;"></div>
+            <div class="animated-bg-shape" style="width: 200px; height: 200px; top: 60%; right: 10%; animation-duration: 15s; animation-delay: 2s;"></div>
+            <div class="animated-bg-shape" style="width: 150px; height: 150px; top: 30%; right: 20%; animation-duration: 25s; animation-delay: 5s;"></div>
+            <div class="animated-bg-shape" style="width: 100px; height: 100px; bottom: 20%; left: 15%; animation-duration: 18s; animation-delay: 3s;"></div>
+        </div>
+        
+        <!-- Blob Elements -->
+        <div class="blob" style="width: 400px; height: 400px; top: 10%; left: 5%; background: rgba(124, 58, 237, 0.3);"></div>
+        <div class="blob" style="width: 350px; height: 350px; bottom: 10%; right: 5%; background: rgba(79, 70, 229, 0.3); animation-delay: 5s;"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <!-- Navigation -->
+            <nav class="py-6">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center">
+                        <i class='bx bx-data text-white text-3xl mr-2 pulse'></i>
+                        <span class="text-white text-xl font-bold">Text Annotation Platform</span>
+                    </div>
+                    <div class="hidden md:flex space-x-8">
+                        <a href="/login" class="text-white hover:text-indigo-200 transition nav-link">Login</a>
+                        <a href="#features" class="text-white hover:text-indigo-200 transition nav-link">Features</a>
+                        <a href="#how-it-works" class="text-white hover:text-indigo-200 transition nav-link">How it Works</a>
+                        <a href="#contact" class="text-white hover:text-indigo-200 transition nav-link">Contact</a>
+                    </div>
+                    <button id="menu-toggle" class="md:hidden text-white text-2xl">
+                        <i class='bx bx-menu'></i>
+                    </button>
+                </div>
+            </nav>
+            
+            <!-- Hero Content -->
+            <div class="py-20 md:py-28">
+                <div class="max-w-3xl mx-auto text-center">
+                    <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-6 opacity-0 animate-fadeInUp typing">
+                        Text Annotation <span class="relative inline-block shine">
+                            Made Easy
+                            <svg class="absolute -bottom-2 left-0 w-full" viewBox="0 0 200 10" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M0,5 Q50,9 100,5 T200,5" stroke="rgba(255,255,255,0.6)" stroke-width="2" fill="none" />
+                            </svg>
+                        </span>
+                    </h1>
+                    <p class="text-xl text-indigo-100 mb-10 opacity-0 animate-fadeInUp delay-100">
+                        A powerful platform for text pair annotation, classification, and dataset management.
+                    </p>
+                    <div class="flex flex-wrap justify-center gap-4 opacity-0 animate-fadeInUp delay-200">
+                        <a href="/login" class="btn-primary px-8 py-4 bg-white text-indigo-700 rounded-lg font-medium shadow-lg hover:bg-indigo-50 transition transform hover:-translate-y-1 hover:shadow-xl ripple">
+                            <span class="flex items-center">
+                                <i class='bx bx-rocket mr-2'></i>
+                                Get Started
+                            </span>
+                        </a>
+                        <a href="#features" class="btn-secondary px-8 py-4 border-2 border-white text-white rounded-lg font-medium hover:bg-white hover:bg-opacity-10 transition transform hover:-translate-y-1 ripple">
+                            <span class="flex items-center">
+                                <i class='bx bx-info-circle mr-2'></i>
+                                Learn More
+                            </span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Floating Elements (Decorative) -->
+            <div class="absolute top-20 left-10 w-20 h-20 bg-white bg-opacity-10 rounded-full blur-xl floating-slow"></div>
+            <div class="absolute bottom-40 right-10 w-32 h-32 bg-purple-500 bg-opacity-20 rounded-full blur-xl floating"></div>
+            <div class="absolute top-40 right-1/4 w-16 h-16 bg-indigo-300 bg-opacity-20 rounded-full blur-lg floating-fast"></div>
+            
+            <!-- Animated Dots -->
+            <div class="absolute inset-0 overflow-hidden pointer-events-none" id="particles-container"></div>
+        </div>
+        
+        <!-- Wave Separator -->
+        <svg class="w-full h-24 fill-current text-white wave-divider" viewBox="0 0 1440 74" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+            <path d="M0,21.3C120,56.7,240,74.3,360,74c120-0.3,240-18.7,360-18.7c120,0,240,18.7,360,24c120,5.3,240-2.7,360-26.7V74H0V21.3z"></path>
+        </svg>
+    </div>
+    
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-white relative overflow-hidden">
+        <!-- Background Elements -->
+        <div class="absolute -right-20 top-20 w-64 h-64 bg-purple-100 rounded-full opacity-30 blur-3xl"></div>
+        <div class="absolute -left-20 bottom-20 w-64 h-64 bg-indigo-100 rounded-full opacity-30 blur-3xl"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <span class="inline-block px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium mb-4">POWERFUL FEATURES</span>
+                <h2 class="text-3xl font-bold text-gray-900 mb-4 gradient-text">
+                    Everything You Need for Text Annotation
+                </h2>
+                <p class="max-w-2xl mx-auto text-gray-600">
+                    Our platform provides all the tools necessary to streamline your text annotation workflow
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="feature-card card-3d glass p-8 rounded-xl shadow-lg" data-aos="fade-up" data-aos-delay="100">
+                    <div class="icon-wrapper mb-6 text-purple-600 bg-purple-100 w-16 h-16 rounded-2xl flex items-center justify-center neon-glow">
+                        <i class='bx bx-label text-3xl'></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">
+                        Text Pair Annotation
+                    </h3>
+                    <p class="text-gray-600 mb-6">
+                        Easily annotate pairs of text with customizable classification systems to build high-quality datasets.
+                    </p>
+                    <a href="#" class="learn-more-btn group">
+                        <span>Learn more</span>
+                        <i class='bx bx-right-arrow-alt ml-1 icon'></i>
+                    </a>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="feature-card card-3d glass p-8 rounded-xl shadow-lg" data-aos="fade-up" data-aos-delay="200">
+                    <div class="icon-wrapper mb-6 text-purple-600 bg-purple-100 w-16 h-16 rounded-2xl flex items-center justify-center neon-glow">
+                        <i class='bx bx-user-check text-3xl'></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">
+                        Task Management
+                    </h3>
+                    <p class="text-gray-600 mb-6">
+                        Assign tasks to annotators, track progress, and manage deadlines in a centralized dashboard.
+                    </p>
+                    <a href="#" class="learn-more-btn group">
+                        <span>Learn more</span>
+                        <i class='bx bx-right-arrow-alt ml-1 icon'></i>
+                    </a>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="feature-card card-3d glass p-8 rounded-xl shadow-lg" data-aos="fade-up" data-aos-delay="300">
+                    <div class="icon-wrapper mb-6 text-purple-600 bg-purple-100 w-16 h-16 rounded-2xl flex items-center justify-center neon-glow">
+                        <i class='bx bx-analyse text-3xl'></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">
+                        Data Analytics
+                    </h3>
+                    <p class="text-gray-600 mb-6">
+                        Get insights into annotation progress, quality, and task completion with detailed analytics.
+                    </p>
+                    <a href="#" class="learn-more-btn group">
+                        <span>Learn more</span>
+                        <i class='bx bx-right-arrow-alt ml-1 icon'></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Additional Features -->
+            <div class="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="glass p-8 rounded-2xl shadow-lg card-3d" data-aos="fade-right">
+                    <div class="flex items-start">
+                        <div class="icon-wrapper mr-6 text-purple-600 bg-purple-100 w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 neon-glow">
+                            <i class='bx bx-shield-quarter text-2xl'></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-900 mb-3">
+                                Advanced Security
+                            </h3>
+                            <p class="text-gray-600">
+                                Enterprise-grade security with role-based access control and data encryption at rest and in transit.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="glass p-8 rounded-2xl shadow-lg card-3d" data-aos="fade-left">
+                    <div class="flex items-start">
+                        <div class="icon-wrapper mr-6 text-purple-600 bg-purple-100 w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 neon-glow">
+                            <i class='bx bx-line-chart text-2xl'></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-900 mb-3">
+                                Performance Metrics
+                            </h3>
+                            <p class="text-gray-600">
+                                Track annotator performance, agreement rates, and quality metrics to ensure dataset reliability.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- How It Works -->
+    <section id="how-it-works" class="py-20 bg-gray-50 relative overflow-hidden">
+        <!-- Background Elements -->
+        <div class="absolute -left-20 top-1/4 w-40 h-40 bg-purple-200 rounded-full opacity-30 blur-3xl floating-slow"></div>
+        <div class="absolute -right-20 bottom-1/4 w-40 h-40 bg-indigo-200 rounded-full opacity-30 blur-3xl floating"></div>
+        
+        <!-- Blob Elements -->
+        <div class="blob" style="width: 350px; height: 350px; top: 20%; right: 10%; background: rgba(124, 58, 237, 0.2);"></div>
+        <div class="blob" style="width: 300px; height: 300px; bottom: 20%; left: 10%; background: rgba(79, 70, 229, 0.2); animation-delay: 3s;"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <span class="inline-block px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium mb-4">WORKFLOW</span>
+                <h2 class="text-3xl font-bold text-gray-900 mb-4 gradient-text">
+                    How It Works
+                </h2>
+                <p class="max-w-2xl mx-auto text-gray-600">
+                    Our streamlined process makes text annotation efficient and accurate
+                </p>
+            </div>
+            
+            <div class="relative">
+                <!-- Connection Line -->
+                <div class="hidden md:block absolute top-24 left-1/2 h-0.5 bg-gradient-to-r from-purple-200 via-purple-400 to-purple-200 w-3/4 -translate-x-1/2" data-aos="fade-right" data-aos-duration="1000"></div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                    <!-- Step 1 -->
+                    <div class="step-card text-center relative z-10" data-aos="fade-up" data-aos-delay="100">
+                        <div class="step-number glow w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 text-xl font-bold mx-auto mb-6">1</div>
+                        <h3 class="text-lg font-semibold mb-3">Upload Dataset</h3>
+                        <p class="text-gray-600">Import text pairs and define classification categories</p>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="step-card text-center relative z-10" data-aos="fade-up" data-aos-delay="200">
+                        <div class="step-number glow w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 text-xl font-bold mx-auto mb-6">2</div>
+                        <h3 class="text-lg font-semibold mb-3">Create Tasks</h3>
+                        <p class="text-gray-600">Set up annotation tasks and assign them to annotators</p>
+                    </div>
+                    
+                    <!-- Step 3 -->
+                    <div class="step-card text-center relative z-10" data-aos="fade-up" data-aos-delay="300">
+                        <div class="step-number glow w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 text-xl font-bold mx-auto mb-6">3</div>
+                        <h3 class="text-lg font-semibold mb-3">Annotate</h3>
+                        <p class="text-gray-600">Annotators classify text pairs according to guidelines</p>
+                    </div>
+                    
+                    <!-- Step 4 -->
+                    <div class="step-card text-center relative z-10" data-aos="fade-up" data-aos-delay="400">
+                        <div class="step-number glow w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 text-xl font-bold mx-auto mb-6">4</div>
+                        <h3 class="text-lg font-semibold mb-3">Review & Export</h3>
+                        <p class="text-gray-600">Review annotations and export the labeled dataset</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-16 text-center" data-aos="zoom-in" data-aos-delay="500">
+                <a href="#" class="btn-primary inline-flex items-center px-6 py-3 bg-purple-600 text-white rounded-lg shadow-lg hover:bg-purple-700 transition transform hover:-translate-y-1 group ripple">
+                    <i class='bx bx-play-circle mr-2 group-hover:animate-pulse'></i> Watch Demo
+                </a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Testimonial/Stats Section -->
+    <section class="py-20 bg-white relative overflow-hidden">
+        <!-- Background Elements -->
+        <div class="absolute left-0 top-1/3 w-64 h-64 bg-purple-50 rounded-full opacity-70 blur-3xl floating-slow"></div>
+        <div class="absolute right-0 bottom-1/3 w-64 h-64 bg-indigo-50 rounded-full opacity-70 blur-3xl floating"></div>
+        
+        <!-- Blob Elements -->
+        <div class="blob" style="width: 400px; height: 400px; top: 30%; left: 10%; background: rgba(124, 58, 237, 0.1);"></div>
+        <div class="blob" style="width: 350px; height: 350px; bottom: 10%; right: 10%; background: rgba(79, 70, 229, 0.1); animation-delay: 4s;"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="bg-gradient-to-br from-purple-700 to-indigo-700 rounded-3xl overflow-hidden shadow-2xl transform transition-all hover:scale-[1.01] neon-glow" data-aos="fade-up">
+                <div class="grid grid-cols-1 md:grid-cols-2">
+                    <div class="p-12 flex items-center">
+                        <div>
+                            <h3 class="text-2xl font-bold text-white mb-6">A Complete Solution for Text Annotation Projects</h3>
+                            <p class="text-purple-100 mb-8">Our platform streamlines the annotation process, saving time and improving the quality of your text data.</p>
+                            <div class="grid grid-cols-2 gap-6">
+                                <div class="stats-counter glass bg-white bg-opacity-10 p-6 rounded-xl">
+                                    <p class="text-3xl font-bold text-white mb-1 counter" data-target="99" data-suffix="%">0%</p>
+                                    <p class="text-purple-200">Accuracy</p>
+                                </div>
+                                <div class="stats-counter glass bg-white bg-opacity-10 p-6 rounded-xl">
+                                    <p class="text-3xl font-bold text-white mb-1 counter" data-target="50" data-suffix="%">0%</p>
+                                    <p class="text-purple-200">Time Saved</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-purple-800 p-12 flex items-center">
+                        <div class="testimonial-card glass bg-white rounded-2xl p-8 shadow-xl">
+                            <div class="flex mb-6">
+                                <i class='bx bxs-star text-yellow-400'></i>
+                                <i class='bx bxs-star text-yellow-400'></i>
+                                <i class='bx bxs-star text-yellow-400'></i>
+                                <i class='bx bxs-star text-yellow-400'></i>
+                                <i class='bx bxs-star text-yellow-400'></i>
+                            </div>
+                            <p class="text-gray-700 mb-6 text-lg italic">"This platform has transformed how we approach text annotation projects. The interface is intuitive, and the task management features have helped us coordinate work across our team effectively."</p>
+                            <div class="flex items-center">
+                                <div class="mr-4">
+                                    <div class="w-14 h-14 rounded-full bg-purple-100 flex items-center justify-center">
+                                        <i class='bx bx-user text-purple-600 text-2xl'></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-lg">Dr. Sarah Johnson</p>
+                                    <p class="text-sm text-gray-500">Research Director</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Additional Stats -->
+            <div class="mt-20 grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="glass text-center p-6 rounded-xl shadow-lg hover:shadow-xl transition card-3d" data-aos="fade-up" data-aos-delay="100">
+                    <div class="text-purple-600 text-4xl mb-4">
+                        <i class='bx bx-group'></i>
+                    </div>
+                    <p class="text-3xl font-bold text-gray-900 mb-2 counter" data-target="10000" data-suffix="+">0+</p>
+                    <p class="text-gray-600">Active Users</p>
+                </div>
+                
+                <div class="glass text-center p-6 rounded-xl shadow-lg hover:shadow-xl transition card-3d" data-aos="fade-up" data-aos-delay="200">
+                    <div class="text-purple-600 text-4xl mb-4">
+                        <i class='bx bx-file'></i>
+                    </div>
+                    <p class="text-3xl font-bold text-gray-900 mb-2 counter" data-target="5" data-suffix="M+">0M+</p>
+                    <p class="text-gray-600">Annotations</p>
+                </div>
+                
+                <div class="glass text-center p-6 rounded-xl shadow-lg hover:shadow-xl transition card-3d" data-aos="fade-up" data-aos-delay="300">
+                    <div class="text-purple-600 text-4xl mb-4">
+                        <i class='bx bx-time-five'></i>
+                    </div>
+                    <p class="text-3xl font-bold text-gray-900 mb-2 counter" data-target="2" data-suffix="x">0x</p>
+                    <p class="text-gray-600">Faster Workflow</p>
+                </div>
+                
+                <div class="glass text-center p-6 rounded-xl shadow-lg hover:shadow-xl transition card-3d" data-aos="fade-up" data-aos-delay="400">
+                    <div class="text-purple-600 text-4xl mb-4">
+                        <i class='bx bx-globe'></i>
+                    </div>
+                    <p class="text-3xl font-bold text-gray-900 mb-2 counter" data-target="50" data-suffix="+">0+</p>
+                    <p class="text-gray-600">Countries</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-gray-50 relative overflow-hidden">
+        <!-- Background Elements -->
+        <div class="absolute left-0 top-0 w-full h-full bg-gradient-to-br from-purple-50 to-indigo-50 opacity-50"></div>
+        <div class="absolute -left-20 top-1/4 w-40 h-40 bg-purple-200 rounded-full opacity-30 blur-3xl floating-slow"></div>
+        <div class="absolute -right-20 bottom-1/4 w-40 h-40 bg-indigo-200 rounded-full opacity-30 blur-3xl floating"></div>
+        
+        <!-- Blob Elements -->
+        <div class="blob" style="width: 300px; height: 300px; top: 10%; right: 10%; background: rgba(124, 58, 237, 0.1);"></div>
+        <div class="blob" style="width: 250px; height: 250px; bottom: 10%; left: 10%; background: rgba(79, 70, 229, 0.1); animation-delay: 2s;"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <span class="inline-block px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium mb-4">CONTACT US</span>
+                <h2 class="text-3xl font-bold text-gray-900 mb-4 gradient-text">
+                    Get in Touch
+                </h2>
+                <p class="max-w-2xl mx-auto text-gray-600">
+                    Have questions about our platform? We're here to help!
+                </p>
+            </div>
+            
+            <div class="max-w-4xl mx-auto">
+                <div class="glass rounded-2xl shadow-xl p-8 md:p-12 card-3d" data-aos="fade-up">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                        <div>
+                            <h3 class="text-xl font-semibold mb-4 gradient-text">Contact Information</h3>
+                            <ul class="space-y-6">
+                                <li class="flex items-start" data-aos="fade-right" data-aos-delay="100">
+                                    <div class="bg-purple-100 p-3 rounded-lg mr-4 neon-glow">
+                                        <i class='bx bx-envelope text-purple-600 text-xl'></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500 mb-1">Email</p>
+                                        <p class="font-medium">info@annotationplatform.com</p>
+                                    </div>
+                                </li>
+                                <li class="flex items-start" data-aos="fade-right" data-aos-delay="200">
+                                    <div class="bg-purple-100 p-3 rounded-lg mr-4 neon-glow">
+                                        <i class='bx bx-phone text-purple-600 text-xl'></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500 mb-1">Phone</p>
+                                        <p class="font-medium">+1 (555) 123-4567</p>
+                                    </div>
+                                </li>
+                                <li class="flex items-start" data-aos="fade-right" data-aos-delay="300">
+                                    <div class="bg-purple-100 p-3 rounded-lg mr-4 neon-glow">
+                                        <i class='bx bx-map text-purple-600 text-xl'></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500 mb-1">Address</p>
+                                        <p class="font-medium">123 AI Street, Tech City, TX 12345</p>
+                                    </div>
+                                </li>
+                            </ul>
+                            
+                            <h3 class="text-xl font-semibold mt-8 mb-4 gradient-text">Follow Us</h3>
+                            <div class="flex space-x-4">
+                                <a href="#" class="social-icon w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 hover:bg-purple-200 transition" data-aos="fade-up" data-aos-delay="100">
+                                    <i class='bx bxl-twitter text-xl'></i>
+                                </a>
+                                <a href="#" class="social-icon w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 hover:bg-purple-200 transition" data-aos="fade-up" data-aos-delay="200">
+                                    <i class='bx bxl-linkedin text-xl'></i>
+                                </a>
+                                <a href="#" class="social-icon w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 hover:bg-purple-200 transition" data-aos="fade-up" data-aos-delay="300">
+                                    <i class='bx bxl-github text-xl'></i>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div data-aos="fade-left">
+                            <h3 class="text-xl font-semibold mb-4 gradient-text">Send Us a Message</h3>
+                            <form id="contact-form">
+                                <div class="space-y-4 mb-6">
+                                    <div class="form-group">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                                        <input type="text" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500" placeholder="Your name">
+                                        <div class="form-progress h-1 w-0 bg-purple-500 mt-1 transition-all duration-300"></div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                        <input type="email" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500" placeholder="your@email.com">
+                                        <div class="form-progress h-1 w-0 bg-purple-500 mt-1 transition-all duration-300"></div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Message</label>
+                                        <textarea rows="5" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500" placeholder="Your message..."></textarea>
+                                        <div class="form-progress h-1 w-0 bg-purple-500 mt-1 transition-all duration-300"></div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <button type="submit" class="btn-primary px-8 py-3 bg-purple-600 text-white rounded-lg shadow-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition ripple">
+                                        <span class="flex items-center">
+                                            <span>Send Message</span>
+                                            <i class='bx bx-send ml-2'></i>
+                                        </span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-3xl p-12 md:p-16 shadow-xl relative overflow-hidden shine neon-glow" data-aos="zoom-in">
+                <!-- Decorative Elements -->
+                <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -translate-y-1/2 translate-x-1/2 floating-slow"></div>
+                <div class="absolute bottom-0 left-0 w-64 h-64 bg-white opacity-5 rounded-full translate-y-1/2 -translate-x-1/2 floating"></div>
+                
+                <!-- Animated Particles -->
+                <div class="absolute inset-0 overflow-hidden" id="cta-particles"></div>
+                
+                <div class="relative z-10 text-center max-w-3xl mx-auto">
+                    <h2 class="text-3xl md:text-4xl font-bold text-white mb-6" data-aos="fade-up">Ready to Transform Your Text Annotation Workflow?</h2>
+                    <p class="text-lg text-purple-100 mb-8" data-aos="fade-up" data-aos-delay="100">Join thousands of researchers and data scientists who are using our platform to build better datasets.</p>
+                    <div class="flex flex-wrap justify-center gap-4" data-aos="fade-up" data-aos-delay="200">
+                        <a href="/login" class="px-8 py-4 bg-white text-purple-700 rounded-lg font-medium shadow-lg hover:bg-purple-50 transition transform hover:-translate-y-1 group ripple">
+                            <span class="flex items-center">
+                                <i class='bx bx-rocket mr-2 group-hover:animate-pulse'></i>
+                                <span>Get Started for Free</span>
+                            </span>
+                        </a>
+                        <a href="#contact" class="px-8 py-4 bg-transparent border-2 border-white text-white rounded-lg font-medium hover:bg-white hover:bg-opacity-10 transition transform hover:-translate-y-1 ripple">
+                            Contact Sales
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-16 relative overflow-hidden">
+        <!-- Background Elements -->
+        <div class="absolute top-0 left-0 w-full h-20 bg-gradient-to-r from-purple-600 to-indigo-600 opacity-20"></div>
+        <div class="absolute -left-20 top-1/4 w-40 h-40 bg-purple-500 rounded-full opacity-10 blur-3xl"></div>
+        <div class="absolute -right-20 bottom-1/4 w-40 h-40 bg-indigo-500 rounded-full opacity-10 blur-3xl"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                <div data-aos="fade-right">
+                    <div class="flex items-center mb-6">
+                        <i class='bx bx-data text-purple-400 text-3xl mr-2 pulse'></i>
+                        <span class="text-xl font-bold">Text Annotation Platform</span>
+                    </div>
+                    <p class="text-gray-400 mb-6">
+                        Providing the tools needed for efficient and accurate text annotation.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-purple-400 hover:bg-purple-600 hover:text-white transition social-icon">
+                            <i class='bx bxl-twitter'></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-purple-400 hover:bg-purple-600 hover:text-white transition social-icon">
+                            <i class='bx bxl-linkedin'></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-purple-400 hover:bg-purple-600 hover:text-white transition social-icon">
+                            <i class='bx bxl-github'></i>
+                        </a>
+                    </div>
+                </div>
+                <div data-aos="fade-up" data-aos-delay="100">
+                    <h5 class="text-lg font-medium mb-6">Platform</h5>
+                    <ul class="space-y-4">
+                        <li><a href="#features" class="text-gray-400 hover:text-white transition flex items-center group"><i class='bx bx-chevron-right text-purple-400 mr-2 transform transition-transform group-hover:translate-x-1'></i>Features</a></li>
+                        <li><a href="#how-it-works" class="text-gray-400 hover:text-white transition flex items-center group"><i class='bx bx-chevron-right text-purple-400 mr-2 transform transition-transform group-hover:translate-x-1'></i>How It Works</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition flex items-center group"><i class='bx bx-chevron-right text-purple-400 mr-2 transform transition-transform group-hover:translate-x-1'></i>Pricing</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition flex items-center group"><i class='bx bx-chevron-right text-purple-400 mr-2 transform transition-transform group-hover:translate-x-1'></i>FAQ</a></li>
+                    </ul>
+                </div>
+                <div data-aos="fade-up" data-aos-delay="200">
+                    <h5 class="text-lg font-medium mb-6">Company</h5>
+                    <ul class="space-y-4">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition flex items-center group"><i class='bx bx-chevron-right text-purple-400 mr-2 transform transition-transform group-hover:translate-x-1'></i>About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition flex items-center group"><i class='bx bx-chevron-right text-purple-400 mr-2 transform transition-transform group-hover:translate-x-1'></i>Careers</a></li>
+                        <li><a href="#contact" class="text-gray-400 hover:text-white transition flex items-center group"><i class='bx bx-chevron-right text-purple-400 mr-2 transform transition-transform group-hover:translate-x-1'></i>Contact</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition flex items-center group"><i class='bx bx-chevron-right text-purple-400 mr-2 transform transition-transform group-hover:translate-x-1'></i>Blog</a></li>
+                    </ul>
+                </div>
+                <div data-aos="fade-up" data-aos-delay="300">
+                    <h5 class="text-lg font-medium mb-6">Legal</h5>
+                    <ul class="space-y-4">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition flex items-center group"><i class='bx bx-chevron-right text-purple-400 mr-2 transform transition-transform group-hover:translate-x-1'></i>Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition flex items-center group"><i class='bx bx-chevron-right text-purple-400 mr-2 transform transition-transform group-hover:translate-x-1'></i>Terms of Service</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition flex items-center group"><i class='bx bx-chevron-right text-purple-400 mr-2 transform transition-transform group-hover:translate-x-1'></i>Cookie Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-8 text-center text-gray-400">
+                <p>&copy; 2023 Text Annotation Platform. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Scripts -->
+    <!-- AOS Animation Library -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize AOS
+            AOS.init({
+                duration: 800,
+                easing: 'ease-in-out',
+                once: false,
+                mirror: true,
+                offset: 50
+            });
+            
+            // Mobile menu toggle
+            const menuToggle = document.getElementById('menu-toggle');
+            const stickyMenuToggle = document.getElementById('sticky-menu-toggle');
+            const closeMenu = document.getElementById('close-menu');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            if (menuToggle && closeMenu && mobileMenu) {
+                menuToggle.addEventListener('click', function() {
+                    mobileMenu.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+                
+                if (stickyMenuToggle) {
+                    stickyMenuToggle.addEventListener('click', function() {
+                        mobileMenu.classList.add('active');
+                        document.body.style.overflow = 'hidden';
+                    });
+                }
+                
+                closeMenu.addEventListener('click', function() {
+                    mobileMenu.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                });
+            }
+            
+            // Smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        // Close mobile menu if open
+                        if (mobileMenu) {
+                            mobileMenu.classList.remove('active');
+                            document.body.style.overflow = 'auto';
+                        }
+                        
+                        window.scrollTo({
+                            top: target.offsetTop,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+            
+            // Scroll progress indicator
+            const scrollProgress = document.querySelector('.scroll-progress');
+            if (scrollProgress) {
+                window.addEventListener('scroll', () => {
+                    const totalHeight = document.body.scrollHeight - window.innerHeight;
+                    const progress = (window.pageYOffset / totalHeight) * 100;
+                    scrollProgress.style.width = `${progress}%`;
+                });
+            }
+            
+            // Sticky header
+            const stickyHeader = document.getElementById('sticky-header');
+            if (stickyHeader) {
+                window.addEventListener('scroll', () => {
+                    if (window.scrollY > 100) {
+                        stickyHeader.classList.add('visible');
+                    } else {
+                        stickyHeader.classList.remove('visible');
+                    }
+                });
+            }
+            
+            // Counter animation
+            const counters = document.querySelectorAll('.counter');
+            
+            const animateCounter = (counter) => {
+                const target = parseInt(counter.getAttribute('data-target'));
+                const suffix = counter.getAttribute('data-suffix') || '';
+                let count = 0;
+                const speed = Math.ceil(target / 100);
+                
+                const updateCount = () => {
+                    if (count < target) {
+                        count += speed;
+                        if (count > target) count = target;
+                        counter.innerText = count + suffix;
+                        requestAnimationFrame(updateCount);
+                    } else {
+                        counter.innerText = target + suffix;
+                    }
+                };
+                
+                updateCount();
+            };
+            
+            // Intersection Observer for counters
+            const counterObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        animateCounter(entry.target);
+                        counterObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.5 });
+            
+            counters.forEach(counter => {
+                counterObserver.observe(counter);
+            });
+            
+            // Form input animation
+            const formInputs = document.querySelectorAll('.form-input');
+            formInputs.forEach(input => {
+                input.addEventListener('focus', () => {
+                    const progressBar = input.nextElementSibling;
+                    if (progressBar && progressBar.classList.contains('form-progress')) {
+                        progressBar.style.width = '100%';
+                    }
+                });
+                
+                input.addEventListener('blur', () => {
+                    const progressBar = input.nextElementSibling;
+                    if (progressBar && progressBar.classList.contains('form-progress')) {
+                        if (input.value.length > 0) {
+                            progressBar.style.width = '100%';
+                        } else {
+                            progressBar.style.width = '0';
+                        }
+                    }
+                });
+            });
+            
+            // Contact form submission animation
+            const contactForm = document.getElementById('contact-form');
+            if (contactForm) {
+                contactForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const button = this.querySelector('button[type="submit"]');
+                    button.innerHTML = '<span class="flex items-center"><i class="bx bx-check text-xl mr-2"></i> Message Sent!</span>';
+                    button.classList.add('bg-green-600');
+                    button.classList.remove('bg-purple-600', 'hover:bg-purple-700');
+                    
+                    // Add success animation
+                    button.classList.add('animate-bounce');
+                    
+                    // Reset form
+                    setTimeout(() => {
+                        this.reset();
+                        const progressBars = this.querySelectorAll('.form-progress');
+                        progressBars.forEach(bar => {
+                            bar.style.width = '0';
+                        });
+                        
+                        // Reset button after 3 seconds
+                        setTimeout(() => {
+                            button.innerHTML = '<span class="flex items-center"><span>Send Message</span><i class="bx bx-send ml-2"></i></span>';
+                            button.classList.remove('bg-green-600', 'animate-bounce');
+                            button.classList.add('bg-purple-600', 'hover:bg-purple-700');
+                        }, 3000);
+                    }, 1000);
+                });
+            }
+            
+            // Particle animation for hero section
+            const particlesContainer = document.getElementById('particles-container');
+            if (particlesContainer) {
+                const createParticle = () => {
+                    const particle = document.createElement('div');
+                    particle.classList.add('particle');
+                    
+                    // Random size between 2px and 6px
+                    const size = Math.random() * 4 + 2;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    
+                    // Random position
+                    const posX = Math.random() * 100;
+                    const posY = Math.random() * 100;
+                    particle.style.left = `${posX}%`;
+                    particle.style.top = `${posY}%`;
+                    
+                    // Random opacity
+                    particle.style.opacity = Math.random() * 0.5 + 0.1;
+                    
+                    // Animation
+                    const duration = Math.random() * 10 + 10;
+                    particle.style.animation = `floating ${duration}s ease-in-out infinite`;
+                    particle.style.animationDelay = `${Math.random() * 5}s`;
+                    
+                    particlesContainer.appendChild(particle);
+                    
+                    // Remove particle after some time to prevent memory issues
+                    setTimeout(() => {
+                        particle.remove();
+                    }, duration * 1000);
+                };
+                
+                // Create initial particles
+                for (let i = 0; i < 30; i++) {
+                    createParticle();
+                }
+                
+                // Create new particles periodically
+                setInterval(createParticle, 1000);
+            }
+            
+            // CTA section particles
+            const ctaParticles = document.getElementById('cta-particles');
+            if (ctaParticles) {
+                const createCtaParticle = () => {
+                    const particle = document.createElement('div');
+                    particle.classList.add('particle');
+                    
+                    // Random size between 2px and 6px
+                    const size = Math.random() * 4 + 2;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    
+                    // Random position
+                    const posX = Math.random() * 100;
+                    const posY = Math.random() * 100;
+                    particle.style.left = `${posX}%`;
+                    particle.style.top = `${posY}%`;
+                    
+                    // Random opacity
+                    particle.style.opacity = Math.random() * 0.5 + 0.1;
+                    
+                    // Animation
+                    const duration = Math.random() * 10 + 10;
+                    particle.style.animation = `floating ${duration}s ease-in-out infinite`;
+                    particle.style.animationDelay = `${Math.random() * 5}s`;
+                    
+                    ctaParticles.appendChild(particle);
+                    
+                    // Remove particle after some time to prevent memory issues
+                    setTimeout(() => {
+                        particle.remove();
+                    }, duration * 1000);
+                };
+                
+                // Create initial particles
+                for (let i = 0; i < 20; i++) {
+                    createCtaParticle();
+                }
+                
+                // Create new particles periodically
+                setInterval(createCtaParticle, 1500);
+            }
+            
+            // Scroll reveal animation
+            const revealElements = document.querySelectorAll('.reveal');
+            
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            revealElements.forEach(element => {
+                revealObserver.observe(element);
+            });
+            
+            // 3D tilt effect for cards
+            const cards = document.querySelectorAll('.card-3d');
+            
+            cards.forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    
+                    const rotateX = (y - centerY) / 20;
+                    const rotateY = (centerX - x) / 20;
+                    
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                });
+                
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
+                });
+            });
+            
+            // Magnetic buttons
+            const magneticBtns = document.querySelectorAll('.magnetic-btn');
+            
+            magneticBtns.forEach(btn => {
+                btn.addEventListener('mousemove', (e) => {
+                    const rect = btn.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    
+                    const deltaX = (x - centerX) / 8;
+                    const deltaY = (y - centerY) / 8;
+                    
+                    btn.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+                });
+                
+                btn.addEventListener('mouseleave', () => {
+                    btn.style.transform = 'translate(0, 0)';
+                });
+            });
+            
+            // Ripple effect for buttons
+            const rippleButtons = document.querySelectorAll('.ripple');
+            
+            rippleButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    const rect = button.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    const ripple = document.createElement('span');
+                    ripple.style.position = 'absolute';
+                    ripple.style.top = `${y}px`;
+                    ripple.style.left = `${x}px`;
+                    ripple.style.transform = 'translate(-50%, -50%)';
+                    ripple.style.width = '0';
+                    ripple.style.height = '0';
+                    ripple.style.borderRadius = '50%';
+                    ripple.style.backgroundColor = 'rgba(255, 255, 255, 0.4)';
+                    ripple.style.transition = 'all 0.6s ease-out';
+                    
+                    button.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.style.width = '300px';
+                        ripple.style.height = '300px';
+                        ripple.style.opacity = '0';
+                    }, 10);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
