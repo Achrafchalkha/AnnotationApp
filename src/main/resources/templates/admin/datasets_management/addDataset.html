@@ -19,6 +19,36 @@
             font-family: 'Poppins', sans-serif;
             background-color: #f8f9fe;
         }
+        
+        .drop-zone {
+            transition: all 0.3s ease;
+        }
+        
+        .drop-zone.active {
+            border-color: #8b5cf6;
+            background-color: #f5f3ff;
+        }
+        
+        .file-input-label {
+            cursor: pointer;
+        }
+        
+        .file-name {
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .file-name.active {
+            display: flex;
+        }
+        
+        .drop-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .drop-zone.active .drop-icon {
+            transform: scale(1.2);
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -76,19 +106,23 @@
                             
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Dataset File</label>
-                                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                                <div id="drop-zone" class="drop-zone mt-1 flex flex-col justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
                                     <div class="space-y-1 text-center">
-                                        <i class='bx bx-cloud-upload text-gray-400 text-3xl'></i>
-                                        <div class="flex text-sm text-gray-600">
-                                            <label for="file" class="relative cursor-pointer bg-white rounded-md font-medium text-purple-600 hover:text-purple-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-purple-500">
+                                        <i class='bx bx-cloud-upload drop-icon text-gray-400 text-3xl'></i>
+                                        <div class="flex text-sm text-gray-600 justify-center">
+                                            <label for="file" class="file-input-label relative bg-white rounded-md font-medium text-purple-600 hover:text-purple-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-purple-500">
                                                 <span>Upload a file</span>
                                                 <input id="file" name="file" type="file" class="sr-only" required>
                                             </label>
                                             <p class="pl-1">or drag and drop</p>
                                         </div>
                                         <p class="text-xs text-gray-500">
-                                            Excel files up to 10MB
+                                            CSV or Excel files up to 80MB
                                         </p>
+                                    </div>
+                                    <div id="file-name" class="file-name mt-3 text-sm flex items-center justify-center text-purple-700">
+                                        <i class='bx bx-file mr-2'></i>
+                                        <span id="file-name-text"></span>
                                     </div>
                                 </div>
                             </div>
@@ -122,5 +156,126 @@
     
     <!-- Main JavaScript -->
     <script th:src="@{/js/main.js}"></script>
+    
+    <!-- Drag and Drop JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropZone = document.getElementById('drop-zone');
+            const fileInput = document.getElementById('file');
+            const fileName = document.getElementById('file-name');
+            const fileNameText = document.getElementById('file-name-text');
+
+            // Prevent default drag behaviors
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, preventDefaults, false);
+                document.body.addEventListener(eventName, preventDefaults, false);
+            });
+
+            // Highlight drop zone when item is dragged over it
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, highlight, false);
+            });
+
+            // Remove highlight when item is dragged out of the zone
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, unhighlight, false);
+            });
+
+            // Handle dropped files
+            dropZone.addEventListener('drop', handleDrop, false);
+
+            // Handle file selection via the input
+            fileInput.addEventListener('change', handleFileSelect, false);
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            function highlight() {
+                dropZone.classList.add('active');
+            }
+
+            function unhighlight() {
+                dropZone.classList.remove('active');
+            }
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                
+                if (files.length) {
+                    fileInput.files = files;
+                    updateFileName(files[0]);
+                }
+            }
+
+            function handleFileSelect() {
+                if (fileInput.files.length) {
+                    updateFileName(fileInput.files[0]);
+                }
+            }
+
+            function updateFileName(file) {
+                fileNameText.textContent = file.name;
+                fileName.classList.add('active');
+                
+                // Add file size display if file is larger than 1MB
+                if (file.size > 1024 * 1024) {
+                    const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                    fileNameText.textContent += ` (${fileSizeMB} MB)`;
+                }
+
+                // Validate file type
+                const validFileTypes = [
+                    // Excel types
+                    'application/vnd.ms-excel',
+                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                    'application/vnd.ms-excel.sheet.macroEnabled.12',
+                    '.xlsx',
+                    '.xls',
+                    // CSV types
+                    'text/csv',
+                    'application/csv',
+                    'application/vnd.ms-excel.csv',
+                    '.csv'
+                ];
+                
+                const fileExtension = file.name.split('.').pop().toLowerCase();
+                if (!validFileTypes.includes(file.type) && 
+                    !validFileTypes.includes(`.${fileExtension}`)) {
+                    showFileError('Invalid file type. Please upload a CSV or Excel file.');
+                    return;
+                }
+
+                // Validate file size (max 80MB)
+                if (file.size > 80 * 1024 * 1024) {
+                    showFileError('File is too large. Maximum size is 80MB.');
+                    return;
+                }
+                
+                // Success indication
+                dropZone.classList.add('active');
+                setTimeout(() => {
+                    dropZone.classList.remove('active');
+                }, 1500);
+            }
+
+            function showFileError(message) {
+                fileNameText.textContent = message;
+                fileNameText.style.color = 'red';
+                fileName.classList.add('active');
+                
+                // Reset after 3 seconds
+                setTimeout(() => {
+                    fileName.classList.remove('active');
+                    fileInput.value = '';
+                    setTimeout(() => {
+                        fileNameText.style.color = '';
+                    }, 300);
+                }, 3000);
+            }
+        });
+    </script>
 </body>
 </html>

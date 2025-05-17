@@ -130,5 +130,63 @@
     
     <!-- Main JavaScript -->
     <script th:src="@{/js/main.js}"></script>
+    
+    <!-- Form Validation JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const checkboxes = document.querySelectorAll('input[name="annotatorIds"]');
+            const submitButton = form.querySelector('button[type="submit"]');
+            
+            // Add error message element
+            const errorContainer = document.createElement('div');
+            errorContainer.className = 'mt-2 text-sm text-red-600 hidden';
+            errorContainer.id = 'annotator-error';
+            errorContainer.textContent = 'Please select at least 3 annotators';
+            
+            // Insert error message after the checkboxes container
+            const checkboxContainer = document.querySelector('.space-y-2');
+            checkboxContainer.parentNode.insertBefore(errorContainer, checkboxContainer.nextSibling);
+            
+            // Function to validate form
+            function validateForm() {
+                const selectedCount = document.querySelectorAll('input[name="annotatorIds"]:checked').length;
+                const errorElement = document.getElementById('annotator-error');
+                
+                if (selectedCount < 3) {
+                    errorElement.classList.remove('hidden');
+                    return false;
+                } else {
+                    errorElement.classList.add('hidden');
+                    return true;
+                }
+            }
+            
+            // Add validation on checkbox change
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', validateForm);
+            });
+            
+            // Validate on form submit
+            form.addEventListener('submit', function(event) {
+                if (!validateForm()) {
+                    event.preventDefault();
+                    
+                    // Highlight message with animation
+                    const errorElement = document.getElementById('annotator-error');
+                    errorElement.classList.add('animate-pulse');
+                    setTimeout(() => {
+                        errorElement.classList.remove('animate-pulse');
+                    }, 1000);
+                    
+                    // Scroll to error message
+                    errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            });
+            
+            // Initial validation on page load
+            validateForm();
+        });
+    </script>
 </body>
 </html> 

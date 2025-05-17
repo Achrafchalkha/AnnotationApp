@@ -234,44 +234,46 @@
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dataset</th>
-                                    <th th:if="${isAdmin}" scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Annotator</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deadline</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Size</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Dataset</th>
+                                    <th th:if="${isAdmin}" scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Annotator</th>
+                                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Deadline</th>
+                                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Size</th>
+                                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
+                                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 <tr th:each="task, stat : ${tasks}" th:if="${!isAdmin && stat.index < 5 || isAdmin}">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
                                         #<span th:text="${task.id}"></span>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
                                         <span th:text="${task.dataset != null ? task.dataset.name : 'Unknown Dataset'}"></span>
                                     </td>
-                                    <td th:if="${isAdmin}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    <td th:if="${isAdmin}" class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
                                         <span th:text="${task.user != null ? task.user.getFirstname() + ' ' + task.user.getLastname() : 'Unassigned'}"></span>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
                                         <span th:text="${#dates.format(task.dateLimite, 'yyyy-MM-dd')}"></span>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
                                         <span th:text="${task.couples != null ? task.couples.size() : 0}"></span> pairs
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        <div class="flex justify-center items-center">
                                             <div class="w-full bg-gray-200 rounded-full h-2.5 mr-2" style="width: 100px;">
                                                 <div class="bg-purple-600 h-2.5 rounded-full" th:style="'width: ' + ${(taskProgress != null && taskProgress.containsKey(task.id) ? taskProgress.get(task.id) : 0) + '%'}"></div>
                                             </div>
                                             <span class="text-sm text-gray-900" th:text="${(taskProgress != null && taskProgress.containsKey(task.id) ? taskProgress.get(task.id) : 0) + '%'}">0%</span>
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <a th:href="@{'/user/tasks/' + ${task.id} + '/direct-access'}" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none">
-                                            Work on Task
-                                        </a>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                                        <div class="flex justify-center">
+                                            <a th:href="@{'/user/tasks/' + ${task.id} + '/direct-access'}" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none">
+                                                Work on Task
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                             </tbody>

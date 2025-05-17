@@ -212,7 +212,7 @@
                                     
                                     <div class="mb-4">
                                         <label class="block text-sm font-medium text-gray-700 mb-2">
-                                            Select Classification
+                                            Select Classification   
                                         </label>
                                         
                                         <!-- Classes from dataset -->
@@ -246,12 +246,17 @@
                                         </div>
                                     </div>
                                     
+                                    <!-- Error message for required classification -->
+                                    <div id="classification-error" class="text-red-600 text-sm mb-3 hidden">
+                                        Please select a classification before proceeding
+                                    </div>
+                                    
                                     <div class="pt-5">
                                         <div class="flex justify-between">
                                             <a th:href="@{/user/tasks/{taskId}/mark-complete(taskId=${task.id})}" class="inline-flex items-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none">
                                                 <i class='bx bx-exit mr-2'></i> Quit Task
                                             </a>
-                                            <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                                            <button id="submit-button" type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
                                                 Save and Next <i class='bx bx-right-arrow-alt ml-2'></i>
                                             </button>
                                         </div>
@@ -319,6 +324,45 @@
                     if (!userMenuButton.contains(event.target) && !userDropdown.contains(event.target)) {
                         userDropdown.classList.add('hidden');
                     }
+                });
+            }
+            
+            // Form validation for classification selection
+            const annotationForm = document.querySelector('form[action*="/direct-annotate"]');
+            const classificationError = document.getElementById('classification-error');
+            
+            if (annotationForm && classificationError) {
+                annotationForm.addEventListener('submit', function(event) {
+                    // Check if any radio button is selected
+                    const selectedClassification = document.querySelector('input[name="annotation"]:checked');
+                    
+                    if (!selectedClassification) {
+                        // Prevent form submission
+                        event.preventDefault();
+                        
+                        // Show error message
+                        classificationError.classList.remove('hidden');
+                        
+                        // Highlight error with animation
+                        classificationError.classList.add('animate-pulse');
+                        setTimeout(() => {
+                            classificationError.classList.remove('animate-pulse');
+                        }, 1000);
+                        
+                        // Scroll to error message
+                        classificationError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    } else {
+                        // Hide error message if it was shown
+                        classificationError.classList.add('hidden');
+                    }
+                });
+                
+                // Hide error message when a classification is selected
+                const radioButtons = document.querySelectorAll('input[name="annotation"]');
+                radioButtons.forEach(radio => {
+                    radio.addEventListener('change', function() {
+                        classificationError.classList.add('hidden');
+                    });
                 });
             }
         });
