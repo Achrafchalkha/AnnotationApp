@@ -1,6 +1,6 @@
 package com.annotation.controller;
 
-
+import com.annotation.model.ClassPossible;
 import com.annotation.model.Dataset;
 import com.annotation.model.Task;
 import com.annotation.model.User;
@@ -271,97 +271,8 @@ public class AdminController {
         return "admin/tasks_debug";
     }
 
-    // New endpoint to review task annotations
-    @GetMapping("/tasks/{taskId}/review")
-    @Transactional(readOnly = true)
-    public String reviewTaskAnnotations(@PathVariable Long taskId, Model model) {
-        try {
-            // Add the current username to the model
-            String username = returnUsername();
-            model.addAttribute("currentUserName", username);
-            
-            // Get task with all relationships loaded
-            Task task = taskRepository.findByIdWithCouples(taskId);
-            
-            if (task == null) {
-                model.addAttribute("errorMessage", "Task not found with ID: " + taskId);
-                return "admin/task_review";
-            }
-            
-            // Filter only annotated couples (text pairs)
-            List<CoupleText> annotatedCouples = task.getCouples().stream()
-                .filter(couple -> couple != null && couple.getClassAnnotation() != null && !couple.getClassAnnotation().isEmpty())
-                .collect(Collectors.toList());
-            
-            // Log information for debugging
-            logger.info("Task ID: " + taskId + " has " + (task.getCouples() != null ? task.getCouples().size() : 0) + 
-                      " total couples and " + annotatedCouples.size() + " annotated couples");
-            
-            // Add task and annotated couples to the model
-            model.addAttribute("task", task);
-            model.addAttribute("annotatedCouples", annotatedCouples);
-            
-            return "admin/task_review";
-        } catch (Exception e) {
-            // Log any unexpected errors
-            logger.severe("Error reviewing task annotations: " + e.getMessage());
-            e.printStackTrace();
-            
-            // Show the error on the same page
-            model.addAttribute("currentUserName", returnUsername());
-            model.addAttribute("errorMessage", "An error occurred while loading task annotations: " + e.getMessage());
-            
-            return "admin/task_review";
-        }
-    }
-    
-    // Endpoint to update the classification of a couple text
-    @PostMapping("/tasks/{taskId}/update-classification")
-    @Transactional
-    public String updateClassification(
-            @PathVariable Long taskId,
-            @RequestParam("coupleId") Long coupleId,
-            @RequestParam("classification") String classification,
-            RedirectAttributes redirectAttributes) {
-        
-        try {
-            // Find the couple text by its ID
-            Optional<CoupleText> coupleOptional = coupleTextRepository.findById(coupleId);
-            
-            if (coupleOptional.isPresent()) {
-                CoupleText couple = coupleOptional.get();
-                
-                // Log before update
-                logger.info("Updating classification for couple #" + coupleId + 
-                           " from '" + couple.getClassAnnotation() + "' to '" + classification + "'");
-                
-                // Update the classification
-                couple.setClassAnnotation(classification);
-                
-                // Save the updated couple
-                coupleTextRepository.save(couple);
-                
-                // Add success message
-                redirectAttributes.addFlashAttribute("successMessage", 
-                    "Classification for pair #" + coupleId + " updated successfully to: " + classification);
-            } else {
-                // Add error message if couple not found
-                redirectAttributes.addFlashAttribute("errorMessage", "Text pair not found with ID: " + coupleId);
-            }
-            
-        } catch (Exception e) {
-            // Log any unexpected errors
-            logger.severe("Error updating classification: " + e.getMessage());
-            e.printStackTrace();
-            
-            // Add error message
-            redirectAttributes.addFlashAttribute("errorMessage", 
-                "An error occurred while updating the classification: " + e.getMessage());
-        }
-        
-        // Redirect back to the review page
-        return "redirect:/admin/tasks/" + taskId + "/review";
-    }
+    // Note: Review functionality has been moved to AdminTaskReviewController
+    // to avoid mapping conflicts and for better separation of concerns
 
     private String returnUsername() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
