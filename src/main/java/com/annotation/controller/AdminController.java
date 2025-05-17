@@ -168,8 +168,15 @@ public class AdminController {
             
             // Pre-calculate progress for each task
             Map<Long, Integer> taskProgress = new HashMap<>();
+            Map<Long, Integer> taskPairCounts = new HashMap<>();
             
             for (Task task : allTasks) {
+                Long taskId = task.getId();
+                
+                // Get accurate count of pairs using direct SQL query
+                int pairCount = taskRepository.countCouplesByTaskId(taskId);
+                taskPairCounts.put(taskId, pairCount);
+                
                 try {
                     if (task.getCouples() != null && !task.getCouples().isEmpty()) {
                         int totalPairs = task.getCouples().size();
@@ -182,19 +189,19 @@ public class AdminController {
                         
                         // Calculate progress percentage - safely handle division by zero
                         int progressPercentage = totalPairs > 0 ? (annotatedPairs * 100) / totalPairs : 0;
-                        taskProgress.put(task.getId(), progressPercentage);
+                        taskProgress.put(taskId, progressPercentage);
                         
-                        logger.info("Task ID " + task.getId() + " progress calculation: " + 
+                        logger.info("Task ID " + taskId + " progress calculation: " + 
                                   annotatedPairs + " annotated out of " + totalPairs + " pairs = " + progressPercentage + "%");
                     } else {
                         // If task has no couples, set progress to 0
-                        taskProgress.put(task.getId(), 0);
-                        logger.info("Task ID " + task.getId() + " has no couples, setting progress to 0%");
+                        taskProgress.put(taskId, 0);
+                        logger.info("Task ID " + taskId + " has no couples, setting progress to 0%");
                     }
                 } catch (Exception e) {
                     // If there's an error processing this task, log it and continue with the next one
-                    logger.warning("Error calculating progress for task " + task.getId() + ": " + e.getMessage());
-                    taskProgress.put(task.getId(), 0);
+                    logger.warning("Error calculating progress for task " + taskId + ": " + e.getMessage());
+                    taskProgress.put(taskId, 0);
                 }
             }
             
@@ -205,6 +212,7 @@ public class AdminController {
             model.addAttribute("allTasks", allTasks);
             model.addAttribute("taskCount", allTasks.size()); // Add explicit count for debugging
             model.addAttribute("taskProgress", taskProgress);
+            model.addAttribute("taskPairCounts", taskPairCounts);
             model.addAttribute("datasets", datasets);
             
             logger.info("FINALIZED: Added " + allTasks.size() + " tasks to the model as 'allTasks' attribute");
@@ -220,6 +228,7 @@ public class AdminController {
             model.addAttribute("errorMessage", "An error occurred while loading tasks: " + e.getMessage());
             model.addAttribute("allTasks", new ArrayList<>());
             model.addAttribute("taskProgress", new HashMap<>());
+            model.addAttribute("taskPairCounts", new HashMap<>());
             model.addAttribute("datasets", new ArrayList<>());
             
             return "admin/all_tasks";
@@ -248,10 +257,17 @@ public class AdminController {
             
             // Pre-calculate progress for each task
             Map<Long, Integer> taskProgress = new HashMap<>();
+            Map<Long, Integer> taskPairCounts = new HashMap<>();
             
             for (Task task : allTasks) {
+                Long taskId = task.getId();
+                
+                // Get accurate count of pairs
+                int pairCount = taskRepository.countCouplesByTaskId(taskId);
+                taskPairCounts.put(taskId, pairCount);
+                
                 if (task.getCouples() != null) {
-                    taskProgress.put(task.getId(), 0); // Simplified progress calculation for debug
+                    taskProgress.put(taskId, 0); // Simplified progress calculation for debug
                 }
             }
             
@@ -261,6 +277,7 @@ public class AdminController {
             // Add data to the model
             model.addAttribute("allTasks", allTasks);
             model.addAttribute("taskProgress", taskProgress);
+            model.addAttribute("taskPairCounts", taskPairCounts);
             model.addAttribute("datasets", datasets);
         } catch (Exception e) {
             logger.severe("Error in tasks debug: " + e.getMessage());
