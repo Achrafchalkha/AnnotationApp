@@ -35,8 +35,7 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Set<Task> tasks = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<Annotation> annotations = new HashSet<>();
+    
 
     // Helper methods for role checking
     public boolean hasRole(String roleName) {

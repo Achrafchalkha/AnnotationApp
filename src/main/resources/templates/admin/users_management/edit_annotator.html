@@ -11,60 +11,330 @@
     <!-- Boxicons -->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     
-    <!-- Google Fonts - Poppins -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts - Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
+        :root {
+            /* Color System */
+            --primary-50: #f5f3ff;
+            --primary-100: #ede9fe;
+            --primary-200: #ddd6fe;
+            --primary-300: #c4b5fd;
+            --primary-400: #a78bfa;
+            --primary-500: #8b5cf6;
+            --primary-600: #7c3aed;
+            --primary-700: #6d28d9;
+            --primary-800: #5b21b6;
+            --primary-900: #4c1d95;
+            
+            --surface-0: #ffffff;
+            --surface-50: #fafafa;
+            --surface-100: #f5f5f5;
+            --surface-200: #e5e5e5;
+            --surface-300: #d4d4d4;
+            --surface-400: #a3a3a3;
+            --surface-500: #737373;
+            --surface-600: #525252;
+            --surface-700: #404040;
+            --surface-800: #262626;
+            --surface-900: #171717;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #f8f9fe;
+            color: var(--surface-800);
         }
         
-        .stats-card {
-            transition: all 0.3s ease;
+        /* Modern Card Styles */
+        .neo-card {
+            border-radius: 16px;
+            background: var(--surface-0);
+            box-shadow: 
+                0 4px 6px -1px rgba(0, 0, 0, 0.05),
+                0 2px 4px -1px rgba(0, 0, 0, 0.03),
+                0 -2px 0 0 rgba(255, 255, 255, 0.6) inset;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.7);
         }
         
-        .stats-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        .neo-card:hover {
+            box-shadow: 
+                0 10px 20px -5px rgba(0, 0, 0, 0.08),
+                0 6px 10px -6px rgba(0, 0, 0, 0.05),
+                0 -2px 0 0 rgba(255, 255, 255, 0.6) inset;
+            transform: translateY(-4px);
         }
         
-        .main-card {
-            transition: all 0.3s ease;
+        /* Glass Card */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
         }
         
-        .main-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        /* Animations */
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
         }
         
-        .card-arrow {
-            transition: transform 0.3s ease;
+        .fade-in-up {
+            animation: fadeInUp 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
         
-        .main-card:hover .card-arrow {
-            transform: translateX(5px);
+        .delay-100 { animation-delay: 0.1s; opacity: 0; }
+        .delay-200 { animation-delay: 0.2s; opacity: 0; }
+        .delay-300 { animation-delay: 0.3s; opacity: 0; }
+        .delay-400 { animation-delay: 0.4s; opacity: 0; }
+        .delay-500 { animation-delay: 0.5s; opacity: 0; }
+        
+        /* Modern Button */
+        .btn-modern {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1.25rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+            color: white;
+            box-shadow: 
+                0 4px 6px -1px rgba(124, 58, 237, 0.2),
+                0 2px 4px -1px rgba(124, 58, 237, 0.1);
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .btn-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 10px 15px -3px rgba(124, 58, 237, 0.3),
+                0 4px 6px -2px rgba(124, 58, 237, 0.1);
         }
         
-        .fade-in {
-            animation: fadeIn 0.5s ease forwards;
+        .btn-modern::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.2) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transition: all 0.6s ease;
         }
         
-        .fade-in-delay-1 {
+        .btn-modern:hover::before {
+            left: 100%;
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: var(--surface-700);
+            border: 1px solid var(--surface-300);
+            box-shadow: 
+                0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--surface-50);
+            box-shadow: 
+                0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        /* Alert Styles */
+        .alert {
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: flex-start;
+            border-left-width: 4px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        
+        .alert-error {
+            background-color: #fef2f2;
+            border-left-color: #ef4444;
+        }
+        
+        /* Form Styles */
+        .form-input {
+            display: block;
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--surface-300);
+            border-radius: 0.375rem;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-500);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--surface-700);
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Header Gradient */
+        .header-gradient {
+            background: linear-gradient(135deg, var(--primary-600), var(--primary-800));
+            color: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header-gradient::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.1;
+        }
+        
+        /* Shine Effect */
+        .shine {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .shine::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.3) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: rotate(30deg);
+            animation: shine 6s infinite;
+        }
+        
+        @keyframes shine {
+            0% { transform: scale(0.5) rotate(30deg) translateX(-100%); }
+            20%, 100% { transform: scale(0.5) rotate(30deg) translateX(100%); }
+        }
+        
+        /* Custom Checkbox */
+        .custom-checkbox {
+            position: relative;
+            padding-left: 2.5rem;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .custom-checkbox input {
+            position: absolute;
             opacity: 0;
-            animation: fadeIn 0.5s ease forwards;
-            animation-delay: 0.2s;
+            cursor: pointer;
+            height: 0;
+            width: 0;
         }
         
-        .fade-in-delay-2 {
-            opacity: 0;
-            animation: fadeIn 0.5s ease forwards;
-            animation-delay: 0.4s;
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 1.5rem;
+            width: 1.5rem;
+            background-color: white;
+            border: 2px solid var(--primary-300);
+            border-radius: 0.375rem;
+            transition: all 0.2s ease;
+        }
+        
+        .custom-checkbox:hover input ~ .checkmark {
+            border-color: var(--primary-400);
+            background-color: var(--primary-50);
+        }
+        
+        .custom-checkbox input:checked ~ .checkmark {
+            background-color: var(--primary-600);
+            border-color: var(--primary-600);
+        }
+        
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+        
+        .custom-checkbox input:checked ~ .checkmark:after {
+            display: block;
+        }
+        
+        .custom-checkbox .checkmark:after {
+            left: 0.5rem;
+            top: 0.25rem;
+            width: 0.25rem;
+            height: 0.5rem;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+        
+        /* Password Reset Card */
+        .password-reset-card {
+            background: linear-gradient(135deg, var(--primary-50), var(--primary-100));
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            border: 1px solid var(--primary-200);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .password-reset-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%237c3aed' fill-opacity='0.05' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
         }
     </style>
 </head>
@@ -76,115 +346,121 @@
     <main class="flex-grow py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Header -->
-            <div class="md:flex md:items-center md:justify-between mb-6">
-                <div class="flex-1 min-w-0">
-                    <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:leading-9 flex items-center">
-                        <i class='bx bx-edit-alt text-purple-600 mr-2'></i>
-                        Edit Annotator
-                    </h2>
-                    <p class="mt-1 text-sm text-gray-500">
-                        Modify annotator information and account settings
-                    </p>
-                </div>
-                <div class="mt-4 flex md:mt-0 md:ml-4">
-                    <a th:href="@{/admin/users}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
-                        <i class='bx bx-arrow-back mr-1'></i>
-                        Back to List
-                    </a>
+            <div class="header-gradient fade-in-up">
+                <div class="relative z-10">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                        <div class="mb-6 md:mb-0">
+                            <div class="flex items-center mb-4">
+                                <div class="p-3 bg-white bg-opacity-20 backdrop-blur-sm rounded-xl mr-4 shine">
+                                    <i class='bx bx-edit-alt text-2xl'></i>
+                                </div>
+                                <h1 class="text-3xl font-bold">Edit Annotator</h1>
+                            </div>
+                            <p class="text-purple-100 max-w-2xl">
+                                Modify annotator information and account settings. You can update personal details and reset the password if needed.
+                            </p>
+                        </div>
+                        
+                        <div>
+                            <a th:href="@{/admin/users}" class="btn-secondary flex items-center gap-2 px-4 py-2 rounded-lg">
+                                <i class='bx bx-arrow-back'></i>
+                                <span>Back to Users</span>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
             
             <!-- Error Messages -->
-            <div th:if="${error}" class="rounded-xl bg-red-50 p-4 mb-6 shadow-sm border-l-4 border-red-500 fade-in-delay-1">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <i class='bx bx-error-circle text-red-400 text-xl'></i>
-                    </div>
-                    <div class="ml-3">
-                        <p class="text-sm font-medium text-red-800" th:text="${error}"></p>
-                    </div>
-                    <div class="ml-auto pl-3">
-                        <div class="-mx-1.5 -my-1.5">
-                            <button class="inline-flex bg-red-50 rounded-md p-1.5 text-red-500 hover:bg-red-100 focus:outline-none">
-                                <i class='bx bx-x'></i>
-                            </button>
-                        </div>
-                    </div>
+            <div th:if="${error}" class="alert alert-error fade-in-up delay-100">
+                <div class="flex-shrink-0 mr-3">
+                    <i class='bx bx-error-circle text-red-500 text-xl'></i>
                 </div>
+                <div class="flex-1">
+                    <p class="text-sm font-medium text-red-800" th:text="${error}"></p>
+                </div>
+                <button class="ml-auto p-1.5 text-red-500 hover:bg-red-100 rounded-full focus:outline-none transition duration-150 ease-in-out">
+                    <i class='bx bx-x'></i>
+                </button>
             </div>
 
             <!-- Edit Annotator Form -->
-            <div class="bg-white shadow-sm overflow-hidden rounded-2xl mb-8 border-t-4 border-purple-500 fade-in-delay-1">
-                <div class="px-6 py-5 border-b border-gray-200">
+            <div class="neo-card fade-in-up delay-200">
+                <div class="px-8 py-6 border-b border-gray-200">
                     <div class="flex items-center">
-                        <div class="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
-                            <i class='bx bx-user-circle text-purple-600 text-xl'></i>
+                        <div class="h-12 w-12 rounded-xl bg-primary-100 flex items-center justify-center shine">
+                            <i class='bx bx-user-circle text-primary-600 text-xl'></i>
                         </div>
-                        <h3 class="ml-3 text-lg leading-6 font-medium text-gray-900">
-                            Annotator Details
-                        </h3>
+                        <div class="ml-4">
+                            <h3 class="text-xl font-semibold text-gray-900">
+                                Annotator Details
+                            </h3>
+                            <p class="mt-1 text-sm text-gray-500">
+                                Update the annotator's personal information and account settings
+                            </p>
+                        </div>
                     </div>
-                    <p class="mt-1 max-w-2xl text-sm text-gray-500">
-                        Update the annotator's personal information and account settings
-                    </p>
                 </div>
-                <div class="px-6 py-5">
-                    <form th:action="@{/admin/users/update}" method="post" th:object="${user}">
+                
+                <div class="p-8">
+                    <form th:action="@{/admin/users/update}" method="post" th:object="${user}" class="space-y-8">
                         <input type="hidden" th:field="*{id}">
                         
-                        <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-                            <div class="sm:col-span-3">
-                                <label for="username" class="block text-sm font-medium text-gray-700">Username*</label>
+                        <div class="grid grid-cols-1 gap-y-6 gap-x-6 sm:grid-cols-6">
+                            <div class="sm:col-span-6">
+                                <label for="username" class="form-label">Username<span class="text-red-500">*</span></label>
                                 <div class="mt-1">
                                     <input type="text" id="username" th:field="*{username}" required
-                                           class="shadow-sm focus:ring-purple-500 focus:border-purple-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                           class="form-input focus:ring-primary-500 focus:border-primary-500"
+                                           placeholder="Enter username">
                                 </div>
-                                <p class="mt-2 text-xs text-gray-500">Username will be used for login. Must be unique.</p>
+                                <p class="mt-2 text-sm text-gray-500">Username will be used for login. Must be unique.</p>
                             </div>
                             
                             <div class="sm:col-span-3">
-                                <!-- Empty space for layout balance -->
-                            </div>
-                            
-                            <div class="sm:col-span-3">
-                                <label for="firstname" class="block text-sm font-medium text-gray-700">First Name*</label>
+                                <label for="firstname" class="form-label">First Name<span class="text-red-500">*</span></label>
                                 <div class="mt-1">
                                     <input type="text" id="firstname" th:field="*{firstname}" required
-                                           class="shadow-sm focus:ring-purple-500 focus:border-purple-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                           class="form-input focus:ring-primary-500 focus:border-primary-500"
+                                           placeholder="Enter first name">
                                 </div>
                             </div>
                             
                             <div class="sm:col-span-3">
-                                <label for="lastname" class="block text-sm font-medium text-gray-700">Last Name*</label>
+                                <label for="lastname" class="form-label">Last Name<span class="text-red-500">*</span></label>
                                 <div class="mt-1">
                                     <input type="text" id="lastname" th:field="*{lastname}" required
-                                           class="shadow-sm focus:ring-purple-500 focus:border-purple-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                           class="form-input focus:ring-primary-500 focus:border-primary-500"
+                                           placeholder="Enter last name">
                                 </div>
                             </div>
                             
                             <div class="sm:col-span-6">
-                                <div class="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg p-4 border border-purple-100">
-                                    <div class="flex items-start">
-                                        <div class="flex items-center h-5">
-                                            <input id="resetPassword" name="resetPassword" type="checkbox" 
-                                                   class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
+                                <div class="password-reset-card">
+                                    <div class="flex relative z-10">
+                                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
+                                            <i class='bx bx-lock-alt text-primary-600 text-xl'></i>
                                         </div>
-                                        <div class="ml-3 text-sm">
-                                            <label for="resetPassword" class="font-medium text-gray-700">Reset Password</label>
-                                            <p class="text-gray-500">Check this option to generate a new random password for this user</p>
+                                        <div class="ml-4">
+                                            <label class="custom-checkbox">
+                                                <span class="text-sm font-medium text-primary-800">Reset Password</span>
+                                                <p class="mt-1 text-sm text-primary-700">Check this option to generate a new random password for this user</p>
+                                                <input id="resetPassword" name="resetPassword" type="checkbox">
+                                                <span class="checkmark"></span>
+                                            </label>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="mt-6 pt-5 border-t border-gray-200">
-                            <div class="flex justify-end">
-                                <a th:href="@{/admin/users}" class="py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 mr-3 transition duration-150 ease-in-out">
+                        <div class="pt-5 border-t border-gray-200">
+                            <div class="flex justify-end space-x-3">
+                                <a th:href="@{/admin/users}" class="btn-secondary px-4 py-2 rounded-lg">
                                     Cancel
                                 </a>
-                                <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-150 ease-in-out">
-                                    <i class='bx bx-save mr-1'></i>
+                                <button type="submit" class="btn-modern">
+                                    <i class='bx bx-save mr-2'></i>
                                     Save Changes
                                 </button>
                             </div>
@@ -192,19 +468,158 @@
                     </form>
                 </div>
             </div>
+            
+            <!-- Activity Section -->
+            <div class="neo-card fade-in-up delay-300 mt-8">
+                <div class="px-8 py-6 border-b border-gray-200">
+                    <div class="flex items-center">
+                        <div class="h-12 w-12 rounded-xl bg-blue-100 flex items-center justify-center shine">
+                            <i class='bx bx-history text-blue-600 text-xl'></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-xl font-semibold text-gray-900">
+                                Recent Activity
+                            </h3>
+                            <p class="mt-1 text-sm text-gray-500">
+                                Recent actions performed by this annotator
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-8">
+                    <div class="relative">
+                        <div class="absolute top-0 bottom-0 left-6 w-0.5 bg-gray-200"></div>
+                        
+                        <div class="relative flex items-start mb-6">
+                            <div class="flex-shrink-0 h-12 w-12 rounded-full bg-green-100 flex items-center justify-center z-10">
+                                <i class='bx bx-check-circle text-green-600 text-xl'></i>
+                            </div>
+                            <div class="ml-4 bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex-1">
+                                <div class="flex justify-between items-center mb-1">
+                                    <h4 class="text-sm font-semibold text-gray-900">Completed Annotation Task</h4>
+                                    <span class="text-xs text-gray-500">2 days ago</span>
+                                </div>
+                                <p class="text-sm text-gray-600">Completed 25 text pair annotations for "Medical Dataset"</p>
+                            </div>
+                        </div>
+                        
+                        <div class="relative flex items-start mb-6">
+                            <div class="flex-shrink-0 h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center z-10">
+                                <i class='bx bx-log-in text-blue-600 text-xl'></i>
+                            </div>
+                            <div class="ml-4 bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex-1">
+                                <div class="flex justify-between items-center mb-1">
+                                    <h4 class="text-sm font-semibold text-gray-900">System Login</h4>
+                                    <span class="text-xs text-gray-500">3 days ago</span>
+                                </div>
+                                <p class="text-sm text-gray-600">Logged in to the annotation platform</p>
+                            </div>
+                        </div>
+                        
+                        <div class="relative flex items-start">
+                            <div class="flex-shrink-0 h-12 w-12 rounded-full bg-amber-100 flex items-center justify-center z-10">
+                                <i class='bx bx-task text-amber-600 text-xl'></i>
+                            </div>
+                            <div class="ml-4 bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex-1">
+                                <div class="flex justify-between items-center mb-1">
+                                    <h4 class="text-sm font-semibold text-gray-900">Task Assignment</h4>
+                                    <span class="text-xs text-gray-500">1 week ago</span>
+                                </div>
+                                <p class="text-sm text-gray-600">Assigned to "Medical Dataset" annotation project</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
     
     <!-- Footer -->
     <footer class="bg-white shadow-inner mt-auto">
-        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
-            <p class="text-center text-sm text-gray-500">
-                &copy; 2023 Annotation Platform. All rights reserved.
-            </p>
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:justify-between md:items-center">
+                <div class="mb-4 md:mb-0">
+                    <div class="flex items-center">
+                        <i class='bx bx-data text-primary-500 text-xl mr-2'></i>
+                        <p class="text-sm font-medium text-gray-700">
+                            Annotation Platform
+                        </p>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-1">
+                        &copy; 2023 All rights reserved.
+                    </p>
+                </div>
+                <div class="flex flex-wrap gap-6">
+                    <a href="#" class="text-gray-500 hover:text-primary-600 transition-colors flex items-center text-sm">
+                        <i class='bx bx-help-circle mr-1.5'></i>
+                        <span>Help Center</span>
+                    </a>
+                    <a href="#" class="text-gray-500 hover:text-primary-600 transition-colors flex items-center text-sm">
+                        <i class='bx bx-cog mr-1.5'></i>
+                        <span>Settings</span>
+                    </a>
+                    <a href="#" class="text-gray-500 hover:text-primary-600 transition-colors flex items-center text-sm">
+                        <i class='bx bx-shield-quarter mr-1.5'></i>
+                        <span>Privacy</span>
+                    </a>
+                </div>
+            </div>
         </div>
     </footer>
     
     <!-- Main JavaScript -->
     <script th:src="@{/js/main.js}"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Close alert messages
+            const alertCloseButtons = document.querySelectorAll('.alert button');
+            alertCloseButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const alert = this.closest('.alert');
+                    alert.style.opacity = '0';
+                    setTimeout(() => {
+                        alert.style.display = 'none';
+                    }, 300);
+                });
+            });
+            
+            // Form validation
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function(event) {
+                const username = document.getElementById('username').value.trim();
+                const firstname = document.getElementById('firstname').value.trim();
+                const lastname = document.getElementById('lastname').value.trim();
+                
+                let isValid = true;
+                
+                if (!username) {
+                    isValid = false;
+                    document.getElementById('username').classList.add('border-red-500');
+                } else {
+                    document.getElementById('username').classList.remove('border-red-500');
+                }
+                
+                if (!firstname) {
+                    isValid = false;
+                    document.getElementById('firstname').classList.add('border-red-500');
+                } else {
+                    document.getElementById('firstname').classList.remove('border-red-500');
+                }
+                
+                if (!lastname) {
+                    isValid = false;
+                    document.getElementById('lastname').classList.add('border-red-500');
+                } else {
+                    document.getElementById('lastname').classList.remove('border-red-500');
+                }
+                
+                if (!isValid) {
+                    event.preventDefault();
+                }
+            });
+        });
+    </script>
 </body>
-</html> 
+</html>

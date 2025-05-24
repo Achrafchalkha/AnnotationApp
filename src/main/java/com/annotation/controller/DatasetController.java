@@ -33,9 +33,8 @@ import com.annotation.repository.RoleRepository;
 import com.annotation.repository.TaskRepository;
 import com.annotation.service.TaskAssignmentService;
 import com.annotation.repository.DatasetRepository;
-import com.annotation.repository.AnnotationRepository;
 import com.annotation.model.ClassPossible;
-import com.annotation.model.Annotation;
+
 
 @Controller
 @RequestMapping("/admin")
@@ -50,7 +49,6 @@ public class DatasetController {
     private final TaskRepository taskRepository;
     private final TaskAssignmentService taskAssignmentService;
     private final DatasetRepository datasetRepository;
-    private final AnnotationRepository annotationRepository;
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -65,8 +63,7 @@ public class DatasetController {
         RoleRepository roleRepository,
         TaskRepository taskRepository,
         TaskAssignmentService taskAssignmentService,
-        DatasetRepository datasetRepository,
-        AnnotationRepository annotationRepository) {
+        DatasetRepository datasetRepository) {
         this.datasetService = datasetService;
         this.coupleTextService = coupleTextService;
         this.asyncDatasetParserService = asyncDatasetParserService;
@@ -76,7 +73,7 @@ public class DatasetController {
         this.taskRepository = taskRepository;
         this.taskAssignmentService = taskAssignmentService;
         this.datasetRepository = datasetRepository;
-        this.annotationRepository = annotationRepository;
+        
     }
 
     @GetMapping("/datasets")

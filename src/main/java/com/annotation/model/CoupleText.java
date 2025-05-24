@@ -37,8 +37,7 @@ public class CoupleText {
     @JoinColumn(name = "dataset_id")
     private Dataset dataset;
 
-    @OneToMany(mappedBy = "coupleText", fetch = FetchType.LAZY)
-    private List<Annotation> annotations = new ArrayList<>();
+   
 
     // To store the annotator's choice of class
     @Column(name = "class_annotation")
